@@ -1,1 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent page scrolling */
+  }
+  
+  app-root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
