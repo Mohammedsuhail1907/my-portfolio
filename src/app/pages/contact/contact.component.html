@@ -1,12 +1,108 @@
-<div class="max-w-md mx-auto mt-12">
-    <h2 class="text-2xl font-semibold mb-4">Contact Me</h2>
-    <form class="flex flex-col gap-4">
-      <input type="text" placeholder="Your Name" class="border p-2 rounded" />
-      <input type="email" placeholder="Your Email" class="border p-2 rounded" />
-      <textarea placeholder="Your Message" class="border p-2 rounded h-32"></textarea>
-      <button type="submit" class="bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-        Send Message
-      </button>
-    </form>
+<section id="contact" class="section contact-section">
+  <div class="container">
+    <h2 class="section-title">Get In Touch</h2>
+    
+    <div class="contact-content">
+      <div class="contact-info">
+        <h3>Let's work together</h3>
+        <p class="contact-description">
+          I'm always interested in new opportunities and exciting projects. 
+          Whether you have a question or just want to say hi, feel free to reach out!
+        </p>
+        
+        <div class="contact-methods">
+          <div class="contact-method">
+            <div class="contact-icon">
+              <i class="bi bi-envelope-fill fs-4"></i>
+            </div>
+            <div>
+              <h4>Email</h4>
+              <p>Mohammedsuhail1907&#64;gmail.com</p>
+            </div>
+          </div>
+          
+          <div class="contact-method">
+            <div class="contact-icon">
+              <i class="bi bi-telephone-fill fs-4"></i>
+            </div>
+            <div>
+              <h4>Phone</h4>
+              <p>+91 9003887006</p>
+            </div>
+          </div>
+          
+          <div class="contact-method">
+            <div class="contact-icon">
+              <i class="bi bi-geo-alt-fill fs-4"></i>
+            </div>
+            <div>
+              <h4>Location</h4>
+              <p>Chennai , Tamil Nadu</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="social-links">
+          <h4>Follow Me</h4>
+          <div class="social-icons d-flex flex-wrap gap-3">
+            <a href="https://www.linkedin.com/in/mohammed-suhail-b3b17b24a/" target="_blank" class="social-link d-flex align-items-center gap-2">
+              <i class="bi bi-linkedin fs-4"></i> LinkedIn
+            </a>
+            <a href="https://github.com/Mohammedsuhail1907" target="_blank" class="social-link d-flex align-items-center gap-2">
+              <i class="bi bi-github fs-4"></i> GitHub
+            </a>
+            <a href=" https://www.facebook.com/share/1LCjB5Ufi6/" target="_blank" class="social-link d-flex align-items-center gap-2">
+              <i class="bi bi-facebook fs-4"></i> Facebook
+            </a>
+            <a href="https://www.instagram.com/sh_a1907?igsh=Y29ycnFjdm92czBm" target="_blank" class="social-link d-flex align-items-center gap-2">
+              <i class="bi bi-instagram fs-4"></i> Instagram
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="contact-form-wrapper">
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" formControlName="name" placeholder="Enter Your Name" required>
+            <div *ngIf="contactForm.get('name')?.invalid && (contactForm.get('name')?.dirty || contactForm.get('name')?.touched)" class="text-danger small">
+             <span>*</span> Name is required.
+            </div>
+          </div>
+      
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" formControlName="email" placeholder="Enter Your Email" required>
+            <div *ngIf="contactForm.get('email')?.invalid && (contactForm.get('email')?.dirty || contactForm.get('email')?.touched)" class="text-danger small">
+              <div *ngIf="contactForm.get('email')?.errors?.['required']"><span>*</span>Email is required.</div>
+              <div *ngIf="contactForm.get('email')?.errors?.['email']"><span>*</span>Invalid email format.</div>
+            </div>
+          </div>
+      
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" formControlName="subject" placeholder="Enter Subject" required>
+            <div *ngIf="contactForm.get('subject')?.invalid && (contactForm.get('subject')?.dirty || contactForm.get('subject')?.touched)" class="text-danger small">
+              <span>*</span> Subject is required.
+            </div>
+          </div>
+      
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" formControlName="message" rows="5" placeholder="Enter Short Description" required></textarea>
+            <div *ngIf="contactForm.get('message')?.invalid && (contactForm.get('message')?.dirty || contactForm.get('message')?.touched)" class="text-danger small">
+              <span>*</span> Message is required.
+            </div>
+          </div>
+      
+          <button type="submit" class="btn btn-primary submit-btn mt-2" [disabled]="contactForm.invalid">
+            Send Message
+          </button>
+        </form>
+      </div>
+      
+       
+    </div>
   </div>
-  
+</section>

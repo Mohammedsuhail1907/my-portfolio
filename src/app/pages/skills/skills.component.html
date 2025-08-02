@@ -1,0 +1,73 @@
+<section id="skills" class="section">
+    <div class="container">
+      <h2 class="section-title">Skills & Technologies</h2>
+      
+      <div class="skills-content">
+        <div class="skills-categories">
+          <div class="skill-category">
+            <h3>Frontend Development</h3>
+            <div class="skills-list">
+              <div *ngFor="let skill of frontendSkills" class="skill-item">
+                <div class="skill-info">
+                  <span class="skill-name">{{ skill.name }}</span>
+                  <span class="skill-percentage">{{ skill.level }}%</span>
+                </div>
+                <div class="skill-bar">
+                  <div 
+                    class="skill-progress frontend" 
+                    [style.width.%]="skill.level">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="skill-category">
+            <h3>Backend Development</h3>
+            <div class="skills-list">
+              <div *ngFor="let skill of backendSkills" class="skill-item">
+                <div class="skill-info">
+                  <span class="skill-name">{{ skill.name }}</span>
+                  <span class="skill-percentage">{{ skill.level }}%</span>
+                </div>
+                <div class="skill-bar">
+                  <div 
+                    class="skill-progress backend" 
+                    [style.width.%]="skill.level">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="skill-category">
+            <h3>Tools & Others</h3>
+            <div class="skills-list">
+              <div *ngFor="let skill of toolsSkills" class="skill-item">
+                <div class="skill-info">
+                  <span class="skill-name">{{ skill.name }}</span>
+                  <span class="skill-percentage">{{ skill.level }}%</span>
+                </div>
+                <div class="skill-bar">
+                  <div 
+                    class="skill-progress tools" 
+                    [style.width.%]="skill.level">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+       
+        <div class="tech-stack">
+          <h3>Technology Stack</h3>
+          <div class="tech-grid">
+            <div *ngFor="let tech of technologies" class="tech-item">
+              <div class="tech-icon">{{ tech.icon }}</div>
+              <span>{{ tech.name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>

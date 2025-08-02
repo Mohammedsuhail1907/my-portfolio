@@ -1,0 +1,21 @@
+<header [class]="'header ' + (isScrolled ? 'scrolled' : '')">
+    <nav class="nav container">
+      <div class="logo">
+        <a href="#home">Mohammed Suhail</a>
+      </div>
+      
+      <ul [class]="'nav-menu ' + (isMenuOpen ? 'active' : '')">
+        <li><a href="#home" (click)="closeMenu()">Home</a></li>
+        <li><a href="#about" (click)="closeMenu()">About</a></li>
+        <!-- <li><a href="#projects" (click)="closeMenu()">Projects</a></li> -->
+        <li><a href="#skills" (click)="closeMenu()">Skills</a></li>
+        <li><a href="#contact" (click)="closeMenu()">Contact</a></li>
+      </ul>
+      
+      <div class="hamburger" (click)="toggleMenu()" [class.active]="isMenuOpen">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </nav>
+  </header>
