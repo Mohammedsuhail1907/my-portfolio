@@ -5,18 +5,16 @@ import { AboutComponent } from './pages/about/about.component';
 import { SkillsComponent } from './pages/skills/skills.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { FooterComponent } from './pages/footer/footer.component';
+import { RouterOutlet } from "@angular/router";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     HeaderComponent,
-    HeroComponent,
-    AboutComponent,
-    SkillsComponent,
-    ContactComponent,
-    FooterComponent
-  ],
+    FooterComponent,
+    RouterOutlet
+],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

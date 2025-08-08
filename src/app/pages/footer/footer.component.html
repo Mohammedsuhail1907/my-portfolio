@@ -2,7 +2,7 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-info">
-          <h3>Mohammed Suhail</h3>
+          <h3 sty>Mohammed Suhail</h3>
           <p>Full Stack Developer passionate about creating amazing digital experiences.</p>
         </div>
         
@@ -10,11 +10,10 @@
           <div class="footer-section">
             <h4>Quick Links</h4>
             <ul>
-              <li><a href="#home">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#skills">Skills</a></li>
-              <!-- <li><a href="#projects">Projects</a></li> -->
-              <li><a href="#contact">Contact</a></li>
+              <li><a (click)="scrollToSection('home')">Home</a></li>
+              <li><a (click)="scrollToSection('about')">About</a></li>
+              <li><a (click)="scrollToSection('skills')">Skills</a></li>
+              <li><a (click)="scrollToSection('contact')">Contact</a></li>
             </ul>
           </div>
           
@@ -49,7 +48,7 @@
           <p>&copy; {{ currentYear }} Mohammed suhail. All rights reserved.</p>
         </div>
         <div class="back-to-top">
-          <a href="#home" class="back-to-top-link">
+          <a (click)="scrollToSection('home')" class="back-to-top-link">
             ↑ Back to Top
           </a>
         </div>

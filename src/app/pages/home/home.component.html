@@ -1,51 +1,6 @@
-<div class="fade-in-container">
-  <div
-    class="flex flex-col md:flex-row min-h-screen relative text-white overflow-hidden"
-    [ngStyle]="{
-      'background-image': 'url(' + getCurrentImage() + ')',
-      'background-size': 'cover',
-      'background-position': 'center',
-      'background-repeat': 'no-repeat'
-    }"
-  >
-    <!-- Dark overlay -->
-    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm z-0"></div>
-
-    <!-- Left Content -->
-    <div class="md:w-1/2 w-full flex flex-col justify-center items-center p-6 z-10">
-      <!-- You can add quote slider here later -->
-    </div>
-
-    <!-- Right Content -->
-    <div class="md:w-1/2 w-full flex flex-col items-center justify-center p-10 z-10">
-      <div class="bg-white/10 backdrop-blur-lg border border-white/20 shadow-xl rounded-2xl p-8 max-w-xl w-full">
-        <h1 class="text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600 fade-in-stagger-1">
-          Hi, I'm {{ name() }}
-        </h1>
-        <p class="text-lg md:text-xl text-blue-100 mb-4 fade-in-stagger-2">
-          I build modern <span class="text-sky-400">Angular</span> apps with
-          <span class="text-sky-300">Tailwind CSS</span>,
-          <span class="text-blue-400">&#64;signals</span>,
-          and <span class="text-cyan-300">&#64;for/&#64;if</span>.
-        </p>
-        <div class="flex flex-wrap gap-1 mb-6 fade-in-stagger-3">
-          @for (skill of skills(); track skill.id) {
-            <span class="px-3 py-1 bg-blue-500/20 text-blue-100 text-sm rounded-full font-medium">
-              {{ skill.label }}
-            </span>
-          } @empty {
-            <span class="text-gray-400 italic">No skills listed.</span>
-          }
-        </div>
-        <div class="flex gap-4 flex-wrap justify-center md:justify-start fade-in-stagger-4">
-          <a routerLink="/projects" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">
-            View Projects
-          </a>
-          <a routerLink="/contact" class="border border-blue-400 text-blue-300 px-6 py-2 rounded-full hover:bg-blue-800 transition">
-            Contact Me
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- src/app/pages/home/home.component.html -->
+<app-hero></app-hero>
+<app-about></app-about>
+<!-- <app-projects></app-projects> -->
+<app-skills></app-skills>
+<app-contact></app-contact>
