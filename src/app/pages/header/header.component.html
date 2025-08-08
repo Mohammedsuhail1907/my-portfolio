@@ -1,22 +1,22 @@
 <header [class]="'header ' + (isScrolled ? 'scrolled' : '')">
-    <nav class="nav container">
-      <div class="logo">
-        <a (click)="scrollToSection('home')" style="cursor: pointer;">Mohammed Suhail</a>
-      </div>
-      
-<!-- header.component.html -->
-<ul [class]="'nav-menu ' + (isMenuOpen ? 'active' : '')">
-  <li><a (click)="scrollToSection('home')">Home</a></li>
-  <li><a (click)="scrollToSection('about')">About</a></li>
-  <li><a (click)="scrollToSection('skills')">Skills</a></li>
-  <li><a (click)="scrollToSection('contact')">Contact</a></li>
-</ul>
+  <nav class="nav container">
+    <div class="logo">
+      <a (click)="scrollToSection('home')" style="cursor: pointer;">Mohammed Suhail</a>
+    </div>
 
-      
-      <div class="hamburger" (click)="toggleMenu()" [class.active]="isMenuOpen">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </nav>
-  </header>
+    <!-- header.component.html -->
+    <ul [class]="'nav-menu ' + (isMenuOpen ? 'active' : '')">
+      <li><a (click)="scrollToSection('home')" style="cursor: pointer;">Home</a></li>
+      <li><a (click)="scrollToSection('about')" style="cursor: pointer;">About</a></li>
+      <li><a (click)="scrollToSection('skills')" style="cursor: pointer;">Skills</a></li>
+      <li><a (click)="scrollToSection('contact')" style="cursor: pointer;">Contact</a></li>
+    </ul>
+
+
+    <div class="hamburger" (click)="toggleMenu()" [class.active]="isMenuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+</header>
