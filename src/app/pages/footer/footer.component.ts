@@ -1,34 +1,29 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { SITE } from '../../config/site.config';
+import { RevealDirective } from '../../directives/reveal.directive';
+import { NavigationService } from '../../services/navigation.service';
+
+/** Services listed in the footer, carried over verbatim from the original template. */
+const FOOTER_SERVICES: readonly string[] = [
+  'Web Development',
+  'Web Application Development',
+  'Mobile Apps',
+];
 
 @Component({
   selector: 'app-footer',
-  standalone: true,
+  imports: [RouterLink, RevealDirective],
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss']
+  styleUrl: './footer.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterComponent {
-  constructor(private router: Router){
+  private readonly navigation = inject(NavigationService);
 
-  }
-  currentYear = new Date().getFullYear();
-
-
-  scrollToSection(sectionId: string) {
-    if (this.router.url !== '/home') {
-      this.router.navigate(['/home']).then(() => {
-        setTimeout(() => this.scrollSmooth(sectionId), 100);
-      });
-    } else {
-      this.scrollSmooth(sectionId);
-    }
-
-  }
-
-  private scrollSmooth(id: string) {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  }
+  protected readonly site = SITE;
+  /** Navigable home sections (hidden sections are already filtered out by the service). */
+  protected readonly links = this.navigation.items;
+  protected readonly services = FOOTER_SERVICES;
+  protected readonly year = new Date().getFullYear();
 }

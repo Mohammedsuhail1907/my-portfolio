@@ -1,7 +1,14 @@
+<a class="skip-link" href="#main-content">Skip to content</a>
+
 <div class="app">
-  <app-header></app-header>
-  <main>
-    <router-outlet></router-outlet>
+  <app-header />
+
+  <main id="main-content" class="site-main" tabindex="-1">
+    <router-outlet />
   </main>
-  <app-footer></app-footer>
+
+  <app-footer />
 </div>
+
+<p-toast position="bottom-right" [life]="5000" />
+<p-scrolltop [threshold]="600" icon="pi pi-chevron-up" styleClass="site-scrolltop" />

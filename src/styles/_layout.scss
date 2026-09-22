@@ -1,0 +1,83 @@
+// Layout primitives shared by every section.
+@use 'mixins' as *;
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+@include up(sm) {
+  :root {
+    --container-pad: 1.5rem;
+  }
+}
+
+@include up(lg) {
+  :root {
+    --container-pad: 2rem;
+  }
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-py);
+  scroll-margin-top: var(--header-h);
+}
+
+.section--alt {
+  background: var(--surface-alt);
+}
+
+.section--bordered {
+  border-top: 1px solid var(--border-color);
+}
+
+.section__body {
+  margin-top: var(--section-gap);
+}
+
+// Two-column split that stacks below the lg breakpoint (hero, about, contact).
+.grid-2 {
+  display: grid;
+  gap: var(--space-10);
+  align-items: start;
+
+  @include up(lg) {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-16);
+  }
+}
+
+// Responsive card grid: as many columns as fit, never narrower than 16rem.
+.grid-auto {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap, var(--space-4));
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cluster-gap, var(--space-3));
+}
+
+.site-main {
+  flex: 1 0 auto;
+}
+
+// The header is fixed. The home page's hero pads for it itself; components rendered by the
+// standalone section routes (/about, /skills, /contact) are pushed below it here. This lives in
+// the global stylesheet because routed components are outside AppComponent's style scope.
+.site-main > :not(router-outlet, app-home) {
+  display: block;
+  padding-top: var(--header-h);
+}

@@ -1,27 +1,30 @@
-// app.routes.ts
 import { Routes } from '@angular/router';
+import { SITE } from './config/site.config';
+
+const brand = `${SITE.name} — ${SITE.role}`;
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
     path: 'home',
-    loadComponent: () =>
-      import('./pages/home/home.component').then(m => m.HomeComponent)
+    title: brand,
+    loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
   },
   {
     path: 'about',
-    loadComponent: () =>
-      import('./pages/about/about.component').then(m => m.AboutComponent)
+    title: `About — ${brand}`,
+    loadComponent: () => import('./pages/about/about.component').then((m) => m.AboutComponent),
   },
   {
     path: 'skills',
-    loadComponent: () =>
-      import('./pages/skills/skills.component').then(m => m.SkillsComponent)
+    title: `Skills — ${brand}`,
+    loadComponent: () => import('./pages/skills/skills.component').then((m) => m.SkillsComponent),
   },
   {
     path: 'contact',
+    title: `Contact — ${brand}`,
     loadComponent: () =>
-      import('./pages/contact/contact.component').then(m => m.ContactComponent)
+      import('./pages/contact/contact.component').then((m) => m.ContactComponent),
   },
-  { path: '**', redirectTo: 'home' }
+  { path: '**', redirectTo: 'home' },
 ];

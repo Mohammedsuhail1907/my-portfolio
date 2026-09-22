@@ -2,10 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Mohammed Suhail</title>
+  <title>Mohammed Suhail — Full Stack Developer</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mohammed Suhail is a full stack developer in Chennai, Tamil Nadu, building responsive, scalable web applications with Angular, TypeScript and Node.js.">
+  <meta name="author" content="Mohammed Suhail">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- Social sharing. og:url, og:image and the canonical link need the deployed origin —
+       set SITE.siteUrl in src/app/config/site.config.ts and fill the three tags below. -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mohammed Suhail — Full Stack Developer">
+  <meta property="og:description" content="Full stack developer in Chennai building responsive, scalable web applications with Angular, TypeScript and Node.js.">
+  <meta property="og:locale" content="en_IN">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Mohammed Suhail — Full Stack Developer">
+  <meta name="twitter:description" content="Full stack developer in Chennai building responsive, scalable web applications with Angular, TypeScript and Node.js.">
+  <!-- <link rel="canonical" href="https://YOUR-DOMAIN/home"> -->
+  <!-- <meta property="og:url" content="https://YOUR-DOMAIN/home"> -->
+  <!-- <meta property="og:image" content="https://YOUR-DOMAIN/assets/images/portrait.jpg"> -->
+
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="preload" href="assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/images/portrait.jpg" as="image" fetchpriority="high">
+
+  <!-- Apply the saved/system colour scheme before first paint to avoid a light→dark flash. -->
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('portfolio-theme');
+        var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) {
+          document.documentElement.classList.add('app-dark');
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', '#020617');
+        }
+      } catch (e) { /* storage unavailable — default to light */ }
+    })();
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Mohammed Suhail",
+    "jobTitle": "Full Stack Developer",
+    "email": "mailto:Mohammedsuhail1907@gmail.com",
+    "telephone": "+91 9003887006",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Chennai",
+      "addressRegion": "Tamil Nadu",
+      "addressCountry": "IN"
+    },
+    "sameAs": [
+      "https://www.linkedin.com/in/mohammed-suhail-b3b17b24a/",
+      "https://github.com/Mohammedsuhail1907",
+      "https://www.facebook.com/share/1LCjB5Ufi6/",
+      "https://www.instagram.com/sh_a1907"
+    ],
+    "knowsAbout": ["Angular", "TypeScript", "JavaScript", "Node.js", "Java", "SQL"]
+  }
+  </script>
 </head>
 <body>
   <app-root></app-root>

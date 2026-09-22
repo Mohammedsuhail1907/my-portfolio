@@ -1,0 +1,36 @@
+// Light-touch adjustments so PrimeNG components sit inside the design system.
+// Design tokens are set in app/config/app.preset.ts; only structural tweaks live here.
+
+.p-card {
+  border: 1px solid var(--border-color);
+}
+
+.p-button {
+  font-weight: 600;
+
+  .p-button-icon {
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  &:not(.p-button-icon-only):hover .p-button-icon-right {
+    transform: translateX(3px);
+  }
+}
+
+.p-tag,
+.p-chip {
+  font-weight: 500;
+}
+
+.p-drawer.site-drawer {
+  width: min(20rem, 88vw);
+}
+
+.p-toast {
+  max-width: calc(100vw - 2rem);
+}
+
+.p-scrolltop.site-scrolltop {
+  right: 1.25rem;
+  bottom: 1.25rem;
+}

@@ -1,64 +1,54 @@
-import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { AboutComponent } from "../about/about.component";
-import { SkillsComponent } from "../skills/skills.component";
-import { ContactComponent } from "../contact/contact.component";
-import { HeroComponent } from "../hero/hero.component";
+import { AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, inject } from '@angular/core';
+import { SITE } from '../../config/site.config';
+import { EXPERIENCE } from '../../data/experience.data';
+import { NavigationService } from '../../services/navigation.service';
+import { AboutComponent } from '../about/about.component';
+import { ContactComponent } from '../contact/contact.component';
+import { ExperienceComponent } from '../experience/experience.component';
+import { HeroComponent } from '../hero/hero.component';
+import { ProjectsComponent } from '../projects/projects.component';
+import { SkillsComponent } from '../skills/skills.component';
 
+/**
+ * The single-page home route: composes every section in order and starts the scroll-spy that
+ * keeps the header's active link in sync. Optional sections render only when they have content
+ * (Experience) or are enabled (Projects) — see app/config/site.config.ts.
+ */
 @Component({
-  standalone: true,
   selector: 'app-home',
-  imports: [CommonModule, RouterModule, AboutComponent, SkillsComponent, ContactComponent, HeroComponent],
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  imports: [
+    HeroComponent,
+    AboutComponent,
+    ExperienceComponent,
+    SkillsComponent,
+    ProjectsComponent,
+    ContactComponent,
+  ],
+  template: `
+    <app-hero />
+    <app-about />
+    @if (showExperience) {
+      <app-experience />
+    }
+    <app-skills />
+    @if (showProjects) {
+      <app-projects />
+    }
+    <app-contact />
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent {
-  name = signal('Mohammed Suhail');
+export class HomeComponent implements AfterViewInit, OnDestroy {
+  private readonly navigation = inject(NavigationService);
 
-  images = signal([
-    'assets/images/Mypicture.jpg',
-    'assets/images/image.jpg',
-    'assets/images/software-engineer.jpg'
-  ]);
+  protected readonly showExperience = EXPERIENCE.length > 0;
+  protected readonly showProjects = SITE.features.projects;
 
-  quotes = signal([
-    'Code is like humor. When you have to explain it, it’s bad.',
-    'First, solve the problem. Then, write the code.',
-    'Clean code always looks like it was written by someone who cares.'
-  ]);
-
-  skills = signal([
-    { id: 1, label: 'Angular' },
-    { id: 2, label: 'Tailwind CSS' },
-    { id: 3, label: 'RxJS' },
-    { id: 4, label: 'Signals' },
-    { id: 5, label: 'Standalone Components' }
-  ]);
-
-  currentIndex = signal(0);
-
-  getCurrentImage(): string {
-    return this.images()[this.currentIndex()];
+  ngAfterViewInit(): void {
+    this.navigation.observe(this.navigation.items.map((item) => item.id));
   }
 
-  getCurrentQuote(): string {
-    return this.quotes()[this.currentIndex()];
-  }
-
-  prevImage(): void {
-    const total = this.images().length;
-    this.currentIndex.set((this.currentIndex() - 1 + total) % total);
-  }
-
-  nextImage(): void {
-    const total = this.images().length;
-    this.currentIndex.set((this.currentIndex() + 1) % total);
-  }
-
-  ngOnInit(): void {
-    setInterval(() => {
-      this.nextImage();
-    }, 5000);
+  ngOnDestroy(): void {
+    this.navigation.disconnect();
   }
 }

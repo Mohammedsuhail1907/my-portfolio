@@ -1,59 +1,63 @@
-<footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-info">
-          <h3 style="background-color: var(--primary-600)">Mohammed Suhail</h3>
-          <p>Full Stack Developer passionate about creating amazing digital experiences.</p>
-        </div>
-        
-        <div class="footer-links">
-          <div class="footer-section">
-            <h4>Quick Links</h4>
-            <ul>
-              <li><a (click)="scrollToSection('home')" style="cursor: pointer;">Home</a></li>
-              <li><a (click)="scrollToSection('about')" style="cursor: pointer;">About</a></li>
-              <li><a (click)="scrollToSection('skills')" style="cursor: pointer;">Skills</a></li>
-              <li><a (click)="scrollToSection('contact')" style="cursor: pointer;">Contact</a></li>
-            </ul>
-          </div>
-          
-          <div class="footer-section">
-            <h4>Services</h4>
-            <ul>
-              <li>Web Development</li>
-              <li>Web Application Development</li>
-              <li>Mobile Apps</li>
-              <!-- <li><a href="#">UI/UX Design</a></li> -->
-              <!-- <li><a href="#">Consulting</a></li> -->
-            </ul>
-          </div>
-          
-          <div class="footer-section">
-            <h4>Connect</h4>
-            <ul>
-              <ul>
-                <li><a href="https://www.linkedin.com/in/mohammed-suhail-b3b17b24a/" target="_blank">LinkedIn</a></li>
-                <li><a href="https://github.com/Mohammedsuhail1907" target="_blank">GitHub</a></li>
-                <li><a href="https://www.facebook.com/share/1LCjB5Ufi6/" target="_blank">FaceBook</a></li>
-                <li><a href="mailto:Mohammedsuhail1907@gmail.com">Email</a></li>
-              </ul>
-              
-            </ul>
-          </div>
-        </div>
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid" appReveal="fade">
+      <div class="site-footer__intro">
+        <p class="site-footer__brand">{{ site.name }}</p>
+        <p class="site-footer__tagline">{{ site.footerTagline }}</p>
       </div>
-      
-      <div class="footer-bottom">
-        <div class="copyright">
-          <p>&copy; {{ currentYear }} Mohammed suhail. All rights reserved.</p>
+
+      <div class="site-footer__columns">
+        <nav class="site-footer__col" aria-labelledby="footer-links-title">
+          <h3 id="footer-links-title" class="site-footer__title">Quick Links</h3>
+          <ul class="site-footer__list" role="list">
+            @for (link of links; track link.id) {
+              <li>
+                <a routerLink="/home" [fragment]="link.id" class="site-footer__link link-underline">
+                  {{ link.label }}
+                </a>
+              </li>
+            }
+          </ul>
+        </nav>
+
+        <div class="site-footer__col">
+          <h3 class="site-footer__title">Services</h3>
+          <ul class="site-footer__list" role="list">
+            @for (service of services; track service) {
+              <li class="site-footer__text">{{ service }}</li>
+            }
+          </ul>
         </div>
-        <div class="back-to-top">
-          <a (click)="scrollToSection('home')"  style="cursor: pointer;" class="back-to-top-link">
-            ↑ Back to Top
-          </a>
-        </div>
+
+        <nav class="site-footer__col" aria-labelledby="footer-connect-title">
+          <h3 id="footer-connect-title" class="site-footer__title">Connect</h3>
+          <ul class="site-footer__list" role="list">
+            @for (social of site.socials; track social.id) {
+              <li>
+                <a
+                  [href]="social.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="site-footer__link link-underline"
+                >
+                  {{ social.label }}
+                </a>
+              </li>
+            }
+            <li>
+              <a [href]="'mailto:' + site.email" class="site-footer__link link-underline">Email</a>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
-  </footer>
 
- 
+    <div class="site-footer__bottom">
+      <p class="site-footer__copyright">&copy; {{ year }} {{ site.name }}. All rights reserved.</p>
+      <a routerLink="/home" [fragment]="'home'" class="site-footer__top">
+        <i class="pi pi-chevron-up" aria-hidden="true"></i>
+        Back to top
+      </a>
+    </div>
+  </div>
+</footer>
