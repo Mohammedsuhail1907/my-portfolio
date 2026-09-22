@@ -1,104 +1,90 @@
-.section {
-  background: #f0f9ff;
+@use 'mixins' as *;
+
+:host {
+  display: block;
+}
+
+// Left column: intro copy + stats ------------------------------------------------
+.about__lead {
+  font-weight: 500;
+  color: var(--text-strong);
+}
+
+.about__paragraph {
+  color: var(--text-body);
+}
+
+// Lead → paragraphs rhythm, stated here so the column does not rely on the global `p + p` rule.
+.about__intro > p + p {
+  margin-top: var(--space-4);
+}
+
+.about__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-color);
+}
+
+// Compact stat tile: the card's own padding token is tightened on the host element.
+.about__stat {
+  --p-card-body-padding: var(--space-4) var(--space-5);
+
+  height: 100%;
+}
+
+.about__stat-value {
+  display: block;
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--brand);
+}
+
+.about__stat-label {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+// Right column: "What I Do" service cards ----------------------------------------
+.about__subtitle {
+  margin-bottom: var(--space-6);
+}
+
+.about__service {
+  --p-card-body-padding: var(--space-5);
+}
+
+.about__service-body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.about__service-icon {
+  @include icon-tile;
+
+  > i {
+    font-size: var(--space-5);
   }
-  
-  .about-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-16);
-    align-items: start;
-  }
-  
-  .about-text {
-    font-size: var(--font-size-lg);
-  }
-  
-  .lead {
-    font-size: var(--font-size-xl);
-    font-weight: 500;
-    color: var(--gray-800);
-    margin-bottom: var(--space-6);
-  }
-  
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-6);
-    margin-top: var(--space-8);
-    padding-top: var(--space-8);
-    border-top: 1px solid var(--gray-200);
-  }
-  
-  .stat-item {
-    text-align: center;
-  }
-  
-  .stat-item h3 {
-    font-size: var(--font-size-4xl);
-    font-weight: 800;
-    color: var(--primary-600);
-    margin-bottom: var(--space-2);
-  }
-  
-  .stat-item p {
-    color: var(--gray-600);
-    font-weight: 500;
-    margin: 0;
-  }
-  
-  .about-skills h3 {
-    margin-bottom: var(--space-8);
-    color: var(--gray-900);
-  }
-  
-  .services {
-    display: grid;
-    gap: var(--space-6);
-  }
-  
-  .service-item {
-    padding: var(--space-6);
-    background: var(--gray-50);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    border: 1px solid var(--gray-100);
-  }
-  
-  .service-item:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    background: white;
-  }
-  
-  .service-icon {
-    font-size: var(--font-size-3xl);
-    margin-bottom: var(--space-4);
-  }
-  
-  .service-item h4 {
-    color: var(--gray-900);
-    margin-bottom: var(--space-3);
-    font-size: var(--font-size-lg);
-  }
-  
-  .service-item p {
-    color: var(--gray-600);
-    margin: 0;
-    line-height: 1.6;
-  }
-  
-  @media (max-width: 768px) {
-    .about-content {
-      grid-template-columns: 1fr;
-      gap: var(--space-12);
-    }
-    
-    .stats {
-      grid-template-columns: 1fr;
-      gap: var(--space-4);
-    }
-    
-    .stat-item h3 {
-      font-size: var(--font-size-3xl);
-    }
-  }
+}
+
+.about__service-text {
+  min-width: 0;
+}
+
+.about__service-title {
+  margin-bottom: var(--space-1);
+}
+
+.about__service-desc {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+}

@@ -1,50 +1,102 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import emailjs, { EmailJSResponseStatus } from 'emailjs-com';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, signal } from '@angular/core';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import emailjs from '@emailjs/browser';
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { TextareaModule } from 'primeng/textarea';
+import { SITE } from '../../config/site.config';
+import { RevealDirective } from '../../directives/reveal.directive';
+import { SectionHeadingComponent } from '../../shared/section-heading/section-heading.component';
 
+type ContactField = 'name' | 'email' | 'subject' | 'message';
+
+/**
+ * Contact section: direct contact methods, social links and the EmailJS-backed message form.
+ * Submission feedback is shown through the root <p-toast> via MessageService.
+ */
 @Component({
   selector: 'app-contact',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    CardModule,
+    ButtonModule,
+    InputTextModule,
+    TextareaModule,
+    MessageModule,
+    SectionHeadingComponent,
+    RevealDirective,
+  ],
   templateUrl: './contact.component.html',
-  styleUrls: ['./contact.component.scss']
+  styleUrl: './contact.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactComponent {
-  contactForm: FormGroup;
+  private readonly fb = inject(NonNullableFormBuilder);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly messageService = inject(MessageService);
 
-  constructor(private fb: FormBuilder) {
-    this.contactForm = this.fb.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      subject: ['', Validators.required],
-      message: ['', Validators.required]
-    });
+  protected readonly site = SITE;
+  protected readonly sending = signal(false);
+
+  protected readonly form = this.fb.group({
+    name: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
+    subject: ['', Validators.required],
+    message: ['', Validators.required],
+  });
+
+  /** True once a field is invalid and the visitor has interacted with it (or tried to submit). */
+  protected isInvalid(field: ContactField): boolean {
+    const control = this.form.controls[field];
+    return control.invalid && (control.dirty || control.touched);
   }
 
-  public onSubmit() {
-    if (this.contactForm.invalid) {
-      console.log(this.contactForm.value);
-      
-      alert('Please fill all fields correctly.');
+  protected hasError(field: ContactField, error: string): boolean {
+    return this.form.controls[field].hasError(error);
+  }
+
+  protected async submit(): Promise<void> {
+    if (this.sending()) {
+      return;
+    }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.focusFirstInvalid();
       return;
     }
 
-    const templateParams = {
-      from_name: this.contactForm.value.name,
-      from_email: this.contactForm.value.email,
-      subject: this.contactForm.value.subject,
-      message: this.contactForm.value.message
-    };
+    const { name, email, subject, message } = this.form.getRawValue();
+    const templateParams = { from_name: name, from_email: email, subject, message };
 
-    emailjs.send('service_0gx117g', 'template_f57gqeh', templateParams, 'BQIBYDNChOJl8S1dX')
-      .then((response: EmailJSResponseStatus) => {
-         console.log('SUCCESS!', response.status, response.text);
-         alert('Message Sent Successfully!');
-         this.contactForm.reset();
-      }, (err) => {
-         console.error('FAILED...', err);
-         alert('Failed to Send Message.');
+    this.sending.set(true);
+    try {
+      await emailjs.send(SITE.emailjs.serviceId, SITE.emailjs.templateId, templateParams, {
+        publicKey: SITE.emailjs.publicKey,
       });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Message sent',
+        detail: "Thanks — I'll get back to you soon.",
+      });
+      this.form.reset();
+    } catch (error) {
+      console.error('FAILED...', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Message not sent',
+        detail: 'Something went wrong. Please try again or email me directly.',
+      });
+    } finally {
+      this.sending.set(false);
+    }
+  }
+
+  private focusFirstInvalid(): void {
+    this.host.nativeElement
+      .querySelector<HTMLElement>('form .ng-invalid[formControlName]')
+      ?.focus();
   }
 }

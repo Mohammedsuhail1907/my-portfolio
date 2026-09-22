@@ -1,45 +1,203 @@
-<!-- <section id="projects" class="section projects-section">
+<section id="projects" class="section section--bordered" aria-labelledby="projects-title">
   <div class="container">
-    <h2 class="section-title">My Projects</h2>
-    
-    <div class="filter-buttons">
-      <button 
-        *ngFor="let category of categories" 
-        [class]="'filter-btn ' + (activeFilter === category ? 'active' : '')"
-        (click)="setFilter(category)">
-        {{ category }}
-      </button>
-    </div>
-    
-    <div class="projects-grid">
-      <div 
-        *ngFor="let project of filteredProjects" 
-        class="project-card fade-in-up">
-        <div class="project-image">
-          <img [src]="project.image" [alt]="project.title" />
-          <div class="project-overlay">
-            <div class="project-links">
-              <a *ngIf="project.demoUrl" [href]="project.demoUrl" target="_blank" class="project-link">
-                <span>👁️</span> Live Demo
-              </a>
-              <a *ngIf="project.githubUrl" [href]="project.githubUrl" target="_blank" class="project-link">
-                <span>📁</span> Code
-              </a>
-            </div>
-          </div>
-        </div>
-        
-        <div class="project-content">
-          <h3>{{ project.title }}</h3>
-          <p>{{ project.description }}</p>
-          
-          <div class="project-tech">
-            <span *ngFor="let tech of project.technologies" class="tech-tag">
-              {{ tech }}
-            </span>
-          </div>
-        </div>
+    <app-section-heading eyebrow="Projects" title="My Projects" titleId="projects-title" />
+
+    <div class="section__body">
+      <div class="projects-filter" appReveal="fade">
+        <p-selectbutton
+          class="projects-filter__control"
+          [options]="categories()"
+          [ngModel]="activeFilter()"
+          (ngModelChange)="setFilter($event)"
+          [allowEmpty]="false"
+          aria-label="Filter projects by category"
+        />
+        <p class="visually-hidden" role="status" aria-live="polite">
+          Showing {{ filtered().length }} of {{ projects().length }} projects
+        </p>
+      </div>
+
+      <div class="grid-auto projects-grid" appReveal revealStagger>
+        @for (project of filtered(); track project.id) {
+          <article class="reveal-item projects-grid__item" [style.--i]="$index">
+            <p-card class="project-card hover-lift">
+              <ng-template #header>
+                <div class="project-card__media">
+                  <img
+                    [src]="project.image"
+                    [alt]="project.title"
+                    loading="lazy"
+                    decoding="async"
+                    width="500"
+                    height="300"
+                  />
+                </div>
+              </ng-template>
+
+              <ng-template #title>
+                <h3 class="project-card__title">{{ project.title }}</h3>
+              </ng-template>
+
+              <div class="project-card__body stack">
+                <p class="text-muted">{{ project.description }}</p>
+                <ul class="cluster project-card__tech" role="list" aria-label="Technologies">
+                  @for (tech of project.technologies; track tech) {
+                    <li>
+                      <p-tag [value]="tech" severity="secondary" [rounded]="true" />
+                    </li>
+                  }
+                </ul>
+              </div>
+
+              <ng-template #footer>
+                <div class="cluster project-card__actions">
+                  <p-button
+                    label="Details"
+                    icon="pi pi-eye"
+                    [text]="true"
+                    (onClick)="open(project, $event)"
+                  />
+                  @if (project.demoUrl) {
+                    <a
+                      pButton
+                      [text]="true"
+                      icon="pi pi-external-link"
+                      label="Live Demo"
+                      [href]="project.demoUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    ></a>
+                  }
+                  @if (project.githubUrl) {
+                    <a
+                      pButton
+                      [text]="true"
+                      icon="pi pi-github"
+                      label="Code"
+                      [href]="project.githubUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    ></a>
+                  }
+                </div>
+              </ng-template>
+            </p-card>
+          </article>
+        } @empty {
+          <p class="projects-empty text-muted">No projects in this category yet.</p>
+        }
       </div>
     </div>
   </div>
-</section> -->
+
+  <p-dialog
+    [visible]="dialogOpen()"
+    (visibleChange)="dialogOpen.set($event)"
+    (onHide)="onDialogHide()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [closeOnEscape]="true"
+    [blockScroll]="true"
+    [header]="selected()?.title"
+    [style]="{ width: 'min(44rem, 92vw)' }"
+    styleClass="project-dialog"
+    closeAriaLabel="Close"
+  >
+    @if (selected(); as project) {
+      <div class="project-dialog__body stack">
+        <div class="project-dialog__media">
+          <img
+            [src]="project.image"
+            [alt]="project.title"
+            loading="lazy"
+            decoding="async"
+            width="500"
+            height="300"
+          />
+        </div>
+
+        <div class="cluster project-dialog__meta">
+          <p-tag [value]="project.category" severity="secondary" [rounded]="true" />
+          @if (project.role) {
+            <span class="project-dialog__role">
+              <i class="pi pi-briefcase" aria-hidden="true"></i>
+              {{ project.role }}
+            </span>
+          }
+        </div>
+
+        <p class="project-dialog__description">{{ project.description }}</p>
+
+        @if (project.features?.length) {
+          <div class="project-dialog__block">
+            <h3 class="project-dialog__heading">Key features</h3>
+            <ul class="stack project-dialog__features" role="list">
+              @for (feature of project.features; track feature) {
+                <li>
+                  <i class="pi pi-check" aria-hidden="true"></i>
+                  <span>{{ feature }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+
+        @if (project.impact) {
+          <div class="project-dialog__block">
+            <h3 class="project-dialog__heading">Impact</h3>
+            <p>{{ project.impact }}</p>
+          </div>
+        }
+
+        <div class="project-dialog__block">
+          <h3 class="project-dialog__heading">Technologies</h3>
+          <ul class="cluster project-dialog__tech" role="list">
+            @for (tech of project.technologies; track tech) {
+              <li>
+                <p-tag [value]="tech" severity="secondary" [rounded]="true" />
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    }
+
+    <ng-template #footer>
+      <div class="project-dialog__actions">
+        <p-button
+          label="Close"
+          severity="secondary"
+          [text]="true"
+          (onClick)="close()"
+        />
+        @if (selected(); as project) {
+          @if (project.githubUrl) {
+            <a
+              pButton
+              [outlined]="true"
+              severity="secondary"
+              icon="pi pi-github"
+              label="Code"
+              [href]="project.githubUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            ></a>
+          }
+          @if (project.demoUrl) {
+            <a
+              pButton
+              icon="pi pi-external-link"
+              iconPos="right"
+              label="Live Demo"
+              [href]="project.demoUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            ></a>
+          }
+        }
+      </div>
+    </ng-template>
+  </p-dialog>
+</section>

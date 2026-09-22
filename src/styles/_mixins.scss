@@ -1,0 +1,114 @@
+// Mixins and helpers only — this partial emits no CSS, so components may `@use 'mixins' as *;`.
+@use 'sass:map';
+
+$breakpoints: (
+  sm: 640px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1280px,
+  xxl: 1536px,
+);
+
+/// Mobile-first media query: `@include up(md) { ... }`
+@mixin up($name) {
+  $bp: map.get($breakpoints, $name);
+  @if not $bp {
+    @error 'Unknown breakpoint #{$name}. Use one of #{map.keys($breakpoints)}.';
+  }
+  @media (min-width: $bp) {
+    @content;
+  }
+}
+
+/// Desktop-first media query for the rare cases a max-width rule reads better.
+@mixin down($name) {
+  $bp: map.get($breakpoints, $name);
+  @if not $bp {
+    @error 'Unknown breakpoint #{$name}. Use one of #{map.keys($breakpoints)}.';
+  }
+  @media (max-width: ($bp - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin motion-safe {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
+  }
+}
+
+@mixin motion-reduce {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+/// Hover styles only for devices that can actually hover (avoids sticky hover on touch).
+@mixin can-hover {
+  @media (hover: hover) and (pointer: fine) {
+    @content;
+  }
+}
+
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin focus-ring($offset: 2px) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: $offset;
+}
+
+/// Base look for a hand-written card surface (PrimeNG p-card is already styled by the theme).
+@mixin card-surface {
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+/// Subtle lift on hover — the one card interaction used across the site.
+@mixin hover-lift($y: -3px) {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+
+  @include can-hover {
+    &:hover {
+      transform: translateY($y);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-hover);
+    }
+  }
+}
+
+/// Small uppercase label placed above a heading.
+@mixin eyebrow {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+/// Icon inside a soft tinted tile.
+@mixin icon-tile($size: 2.75rem, $radius: var(--radius-md)) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: $size;
+  height: $size;
+  border-radius: $radius;
+  background: var(--brand-soft);
+  color: var(--brand);
+}

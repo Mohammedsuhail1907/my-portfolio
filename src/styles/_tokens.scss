@@ -1,0 +1,145 @@
+// ============================================================================
+// Design tokens — the single source of truth for colour, type, space, radius,
+// elevation and motion. Values mirror the PrimeNG Aura primitives selected in
+// app/config/app.preset.ts (blue / slate) so PrimeNG components and hand-written
+// sections share one palette in both colour schemes. Literal values (not --p-*
+// variables) are used so the page paints correctly before Angular boots.
+// ============================================================================
+
+:root {
+  // Brand -------------------------------------------------------------------
+  --brand: #2563eb;                 // blue-600
+  --brand-hover: #1d4ed8;           // blue-700
+  --brand-soft: #eff6ff;            // blue-50  — tinted backgrounds
+  --brand-soft-strong: #dbeafe;     // blue-100
+  --brand-ring: rgba(37, 99, 235, 0.35);
+  --accent: #7c3aed;                // violet-600 — use sparingly
+  --accent-soft: #f5f3ff;
+
+  // Status ------------------------------------------------------------------
+  --success: #059669;
+  --warning: #d97706;
+  --error: #dc2626;
+
+  // Surfaces ----------------------------------------------------------------
+  --surface-page: #ffffff;
+  --surface-alt: #f8fafc;           // slate-50 — alternating sections
+  --surface-card: #ffffff;
+  --surface-card-hover: #ffffff;
+  --surface-inset: #f1f5f9;         // slate-100 — chips, inputs on cards
+  --surface-header: rgba(255, 255, 255, 0.85);
+  --surface-footer: #0f172a;        // slate-900
+  --border-color: #e2e8f0;          // slate-200
+  --border-hover: #bfdbfe;          // blue-200
+  --border-strong: #cbd5e1;         // slate-300
+
+  // Text --------------------------------------------------------------------
+  --text-strong: #0f172a;           // slate-900 — headings
+  --text-body: #334155;             // slate-700
+  --text-muted: #64748b;            // slate-500 (4.8:1 on white)
+  --text-subtle: #94a3b8;           // slate-400 — decorative only
+  --text-inverse: #f8fafc;
+  --text-on-footer: #cbd5e1;        // slate-300 on slate-900 ≈ 11:1
+  --text-on-footer-muted: #94a3b8;  // slate-400 on slate-900 ≈ 5.9:1
+
+  // Typography --------------------------------------------------------------
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  --fs-display: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --fs-h2: clamp(1.875rem, 1.45rem + 1.5vw, 2.75rem);
+  --fs-h3: clamp(1.25rem, 1.12rem + 0.5vw, 1.5rem);
+  --fs-h4: 1.125rem;
+  --fs-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --fs-base: 1rem;
+  --fs-sm: 0.875rem;
+  --fs-xs: 0.8125rem;
+  --lh-tight: 1.1;
+  --lh-snug: 1.3;
+  --lh-body: 1.65;
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.08em;
+
+  // Spacing (4px scale) -----------------------------------------------------
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --section-py: clamp(4rem, 5vw + 1.5rem, 7rem);
+  --section-gap: clamp(2.5rem, 4vw, 4rem);
+
+  // Layout ------------------------------------------------------------------
+  --container-max: 72rem;
+  --container-pad: 1rem;
+  --header-h: 4rem;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  // Elevation ---------------------------------------------------------------
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 6px 16px -6px rgba(15, 23, 42, 0.12), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 18px 36px -14px rgba(15, 23, 42, 0.2);
+
+  // Motion ------------------------------------------------------------------
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 450ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --stagger-step: 60ms;
+
+  // Layers ------------------------------------------------------------------
+  --z-header: 100;
+  --z-skip-link: 1200;
+
+  --focus-ring: var(--brand);
+  color-scheme: light;
+}
+
+:root.app-dark {
+  --brand: #60a5fa;                 // blue-400
+  --brand-hover: #93c5fd;           // blue-300
+  --brand-soft: rgba(96, 165, 250, 0.12);
+  --brand-soft-strong: rgba(96, 165, 250, 0.22);
+  --brand-ring: rgba(96, 165, 250, 0.45);
+  --accent: #a78bfa;
+  --accent-soft: rgba(167, 139, 250, 0.14);
+
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
+
+  --surface-page: #020617;          // slate-950
+  --surface-alt: #0a1122;
+  --surface-card: #0f172a;          // slate-900 (= PrimeNG dark content background)
+  --surface-card-hover: #13203a;
+  --surface-inset: #1e293b;         // slate-800
+  --surface-header: rgba(2, 6, 23, 0.8);
+  --surface-footer: #020617;
+  --border-color: #1e293b;          // slate-800
+  --border-hover: rgba(96, 165, 250, 0.45);
+  --border-strong: #334155;
+
+  --text-strong: #f1f5f9;
+  --text-body: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  --text-inverse: #0f172a;
+  --text-on-footer: #cbd5e1;
+  --text-on-footer-muted: #94a3b8;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 16px -6px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 18px 36px -14px rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
+}

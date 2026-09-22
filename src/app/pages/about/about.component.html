@@ -1,69 +1,46 @@
-<section id="about" class="section">
+<section id="about" class="section section--alt" aria-labelledby="about-title">
   <div class="container">
-    <h2 class="section-title">About Me</h2>
-    
-    <div class="about-content">
-      <div class="about-text">
-        <p class="lead">
-          I'm a passionate full-stack developer with over 1 years of experience 
-          creating digital solutions that make a difference.
-        </p>
-        
-        <p>
-          My journey in web development started with a curiosity about how things work 
-          on the internet. Since then, I've evolved into a developer who loves creating 
-          efficient, scalable, and user-friendly applications.
-        </p>
-        
-        <p>
-          I specialize in modern JavaScript frameworks, particularly Angular , 
-          along with Node.js for backend development. I'm always eager to learn new 
-          technologies and stay updated with the latest industry trends.
-        </p>
-        
-        <div class="stats">
-          <div class="stat-item">
-            <h3>5+</h3>
-            <p>Projects Completed</p>
-          </div>
-          <div class="stat-item">
-            <h3>1+</h3>
-            <p>Years Experience</p>
-          </div>
-          <!-- <div class="stat-item">
-            <h3>30+</h3>
-            <p>Happy Clients</p>
-          </div> -->
-        </div>
+    <app-section-heading eyebrow="About" title="About Me" titleId="about-title" />
+
+    <div class="section__body grid-2">
+      <div class="about__intro" appReveal>
+        <p class="lead about__lead">{{ intro.lead }}</p>
+        @for (paragraph of intro.paragraphs; track paragraph) {
+          <p class="about__paragraph">{{ paragraph }}</p>
+        }
+
+        <ul class="about__stats" role="list" appReveal revealStagger>
+          @for (stat of stats; track stat.label) {
+            <li class="reveal-item" [style.--i]="$index">
+              <p-card styleClass="about__stat">
+                <span class="about__stat-value">{{ stat.value }}</span>
+                <span class="about__stat-label">{{ stat.label }}</span>
+              </p-card>
+            </li>
+          }
+        </ul>
       </div>
-      
-      <div class="about-skills">
-        <h3>What I Do</h3>
-        <div class="services">
-          <!-- <div class="service-item">
-            <div class="service-icon">🎨</div>
-            <h4>UI/UX Design</h4>
-            <p>Creating intuitive and beautiful user interfaces with attention to detail and user experience.</p>
-          </div> -->
-          
-          <div class="service-item">
-            <div class="service-icon">💻</div>
-            <h4>Web Development</h4>
-            <p>Building responsive, fast, and scalable web applications using modern technologies.</p>
-          </div>
-          
-          <div class="service-item">
-            <div class="service-icon">📱</div>
-            <h4>Mobile Apps</h4>
-            <p>Developing cross-platform mobile applications that work seamlessly across devices.</p>
-          </div>
-          
-          <div class="service-item">
-            <div class="service-icon">🚀</div>
-            <h4>Performance</h4>
-            <p>Optimizing applications for speed, efficiency, and excellent user experience.</p>
-          </div>
-        </div>
+
+      <div class="about__services" appReveal>
+        <h3 class="about__subtitle">What I Do</h3>
+
+        <ul class="stack" role="list" appReveal revealStagger>
+          @for (service of services; track service.title) {
+            <li class="reveal-item" [style.--i]="$index">
+              <p-card styleClass="about__service hover-lift">
+                <div class="about__service-body">
+                  <span class="about__service-icon">
+                    <i [class]="service.icon" aria-hidden="true"></i>
+                  </span>
+                  <div class="about__service-text">
+                    <h4 class="about__service-title">{{ service.title }}</h4>
+                    <p class="text-muted about__service-desc">{{ service.description }}</p>
+                  </div>
+                </div>
+              </p-card>
+            </li>
+          }
+        </ul>
       </div>
     </div>
   </div>

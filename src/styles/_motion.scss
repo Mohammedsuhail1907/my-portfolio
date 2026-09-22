@@ -1,0 +1,192 @@
+// The animation language: reveal-on-scroll, entrance, hover lift, route and theme transitions.
+// Every duration/easing comes from the motion tokens in _tokens.scss.
+@use 'mixins' as *;
+
+// Scroll reveal (driven by RevealDirective) ------------------------------------
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+  will-change: opacity, transform;
+
+  &.reveal--fade {
+    transform: none;
+  }
+
+  &.reveal--scale {
+    transform: scale(0.96);
+  }
+
+  &.reveal--left {
+    transform: translateX(-24px);
+  }
+
+  &.reveal--right {
+    transform: translateX(24px);
+  }
+
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+}
+
+// Staggered children: the group host gets `.reveal-group`, each child `.reveal-item`
+// with `[style.--i]="$index"`.
+.reveal-group .reveal-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+  transition-delay: calc(var(--i, 0) * var(--stagger-step));
+}
+
+.reveal-group.is-visible .reveal-item {
+  opacity: 1;
+  transform: none;
+}
+
+// Entrance (above-the-fold content, plays once on load) ------------------------
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes enter-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.enter {
+  opacity: 0;
+  animation: enter-up 0.7s var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+
+.enter--fade {
+  animation-name: enter-fade;
+}
+
+.enter--scale {
+  animation-name: enter-scale;
+}
+
+// Interaction utilities -----------------------------------------------------------
+.hover-lift {
+  @include hover-lift;
+}
+
+.link-underline {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -2px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 1px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
+
+// Route transitions (View Transitions API; skipped for same-page fragment jumps) -----
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+::view-transition-old(root) {
+  animation: vt-out 180ms var(--ease-standard) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-in 280ms var(--ease-out) both;
+}
+
+// The header is captured separately so it stays put while the page below transitions.
+.site-header {
+  view-transition-name: site-header;
+}
+
+// Theme switch: ThemeService adds this class for one beat so colours cross-fade.
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color var(--dur-slow) var(--ease-standard),
+    color var(--dur-slow) var(--ease-standard),
+    border-color var(--dur-slow) var(--ease-standard),
+    fill var(--dur-slow) var(--ease-standard) !important;
+}
+
+// Reduced motion: everything is visible and static; nothing is gated behind animation.
+@include motion-reduce {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal,
+  .reveal-group .reveal-item,
+  .enter {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}

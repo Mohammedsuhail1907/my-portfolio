@@ -1,127 +1,226 @@
-.header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    z-index: 1000;
-    transition: all 0.3s ease;
-    padding: var(--space-4) 0;
+@use 'mixins' as *;
+
+:host {
+  display: block;
+}
+
+// Fixed bar -------------------------------------------------------------------------------------
+.site-header {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: var(--z-header);
+  height: var(--header-h);
+  background: var(--surface-header);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition:
+    border-color var(--dur-base) var(--ease-standard),
+    box-shadow var(--dur-base) var(--ease-standard),
+    background-color var(--dur-base) var(--ease-standard);
+}
+
+.site-header--scrolled {
+  border-bottom-color: var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: 100%;
+}
+
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-strong);
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--brand);
   }
-  
-  .header.scrolled {
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: var(--shadow-md);
-    padding: var(--space-3) 0;
-  }
-  
-  .nav {
+}
+
+// Desktop links ---------------------------------------------------------------------------------
+.site-header__links {
+  display: none;
+
+  @include up(lg) {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: var(--space-1);
   }
-  
-  .logo a {
-    font-size: var(--font-size-xl);
-    font-weight: 700;
-    color: var(--primary-600);
-    text-decoration: none;
-    background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
-  .nav-menu {
-    display: flex;
-    list-style: none;
-    gap: var(--space-8);
-    margin: 0;
-  }
-  
-  .nav-menu li a {
-    text-decoration: none;
-    color: var(--gray-700);
-    font-weight: 500;
-    transition: color 0.3s ease;
-    position: relative;
-  }
-  
-  .nav-menu li a:hover {
-    color: var(--primary-600);
-  }
-  
-  .nav-menu li a::after {
+}
+
+.site-header__link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color var(--dur-fast) var(--ease-standard);
+
+  // Animated indicator: scales in on hover and stays for the active section.
+  &::after {
     content: '';
     position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
+    inset-inline: var(--space-3);
+    bottom: 0.45rem;
     height: 2px;
-    background: var(--primary-600);
-    transition: width 0.3s ease;
+    border-radius: 1px;
+    background: var(--brand);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-base) var(--ease-out);
   }
-  
-  .nav-menu li a:hover::after {
-    width: 100%;
+
+  &:hover {
+    color: var(--text-strong);
   }
-  
-  .hamburger {
+
+  &.is-active {
+    color: var(--brand);
+  }
+
+  &:hover::after,
+  &.is-active::after {
+    transform: scaleX(1);
+  }
+}
+
+// Actions ---------------------------------------------------------------------------------------
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+// 44px tap targets (PrimeNG's icon-only button is 2.5rem).
+.site-header__action {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.site-header__menu {
+  @include up(lg) {
     display: none;
+  }
+}
+
+// Drawer (mobile menu) --------------------------------------------------------------------------
+:host ::ng-deep .site-drawer {
+  .p-drawer-header {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .p-drawer-content {
+    display: flex;
     flex-direction: column;
-    cursor: pointer;
-    gap: 4px;
+    padding: var(--space-2) var(--space-5) var(--space-6);
   }
-  
-  .hamburger span {
-    width: 25px;
-    height: 3px;
-    background: var(--gray-700);
-    transition: all 0.3s ease;
+}
+
+.site-drawer__brand {
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-strong);
+}
+
+.site-drawer__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-height: 100%;
+}
+
+.site-drawer__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+// Items slide in one after another once the drawer has opened.
+.site-drawer__item {
+  opacity: 0;
+  transform: translateX(12px);
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+  transition-delay: calc(var(--i, 0) * var(--stagger-step) + 60ms);
+}
+
+.site-drawer__list.is-open .site-drawer__item {
+  opacity: 1;
+  transform: none;
+}
+
+.site-drawer__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 3rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-lead);
+  font-weight: 500;
+  color: var(--text-body);
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
+
+  &:hover {
+    background: var(--surface-inset);
+    color: var(--text-strong);
   }
-  
-  .hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(8px, 8px);
+
+  &.is-active {
+    background: var(--brand-soft);
+    color: var(--brand);
   }
-  
-  .hamburger.active span:nth-child(2) {
-    opacity: 0;
-  }
-  
-  .hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -6px);
-  }
-  
-  @media (max-width: 768px) {
-    .hamburger {
-      display: flex;
-    }
-    
-    .nav-menu {
-      position: fixed;
-      top: 70px;
-      left: -100%;
-      width: 100%;
-      height: calc(100vh - 70px);
-      background: white;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      padding-top: var(--space-12);
-      transition: left 0.3s ease;
-      box-shadow: var(--shadow-lg);
-    }
-    
-    .nav-menu.active {
-      left: 0;
-    }
-    
-    .nav-menu li {
-      margin: var(--space-4) 0;
-    }
-    
-    .nav-menu li a {
-      font-size: var(--font-size-lg);
-    }
-  }
+}
+
+.site-drawer__link-icon {
+  font-size: var(--fs-xs);
+  color: var(--text-subtle);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.site-drawer__link:hover .site-drawer__link-icon {
+  transform: translateX(3px);
+}
+
+.site-drawer__theme {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-color);
+}
+
+.site-drawer__theme-label {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.site-drawer__theme-value {
+  margin-right: auto;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-strong);
+}

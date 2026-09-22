@@ -1,24 +1,28 @@
-import { Component } from '@angular/core';
-import { HeaderComponent } from './pages/header/header.component';
-import { HeroComponent } from './pages/hero/hero.component';
-import { AboutComponent } from './pages/about/about.component';
-import { SkillsComponent } from './pages/skills/skills.component';
-import { ContactComponent } from './pages/contact/contact.component';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { ScrollTop } from 'primeng/scrolltop';
+import { Toast } from 'primeng/toast';
 import { FooterComponent } from './pages/footer/footer.component';
-import { RouterOutlet } from "@angular/router";
+import { HeaderComponent } from './pages/header/header.component';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [
-    HeaderComponent,
-    FooterComponent,
-    RouterOutlet
-],
+  imports: [HeaderComponent, FooterComponent, RouterOutlet, Toast, ScrollTop],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrl: './app.component.scss',
 })
-export class AppComponent {}
+export class AppComponent {
+  constructor() {
+    // Instantiate eagerly so the persisted/system theme is applied as soon as the app boots.
+    inject(ThemeService);
 
-//ProjectsComponent,
-//import { ProjectsComponent } from './pages/projects/projects.component';
+    // This is a single-page portfolio: section navigation scrolls in place and never touches the
+    // URL (see NavigationService.scrollTo). Clean up a leftover #fragment from an old bookmark or
+    // shared link so the address bar always shows just the origin. replaceState neither creates a
+    // history entry nor triggers navigation.
+    if (location.hash) {
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+  }
+}

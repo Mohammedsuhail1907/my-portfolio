@@ -1,143 +1,97 @@
-.section {
-    background: rgb(241, 246, 248);
+@use 'mixins' as *;
+
+:host {
+  display: block;
+}
+
+// Category grid ---------------------------------------------------------------------------------
+.skills-grid {
+  gap: var(--space-5);
+  // Cards hug their content: categories have very different row counts, so equal heights would
+  // leave the one-item Database card mostly empty.
+  align-items: start;
+
+  @include up(xl) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  
-  .skills-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: var(--space-16);
-    align-items: start;
+}
+
+.skills-grid__item {
+  display: flex;
+}
+
+.skill-card {
+  width: 100%;
+}
+
+.skill-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.skill-card__icon {
+  @include icon-tile(2.5rem);
+
+  > i {
+    font-size: var(--fs-lead);
   }
-  
-  .skills-categories {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-12);
+}
+
+.skill-card__title {
+  font-size: var(--fs-h4);
+}
+
+// Skill rows ------------------------------------------------------------------------------------
+.skill-list {
+  --stack-gap: 0;
+}
+
+.skill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 2.75rem;
+  padding-block: var(--space-2);
+  border-top: 1px solid var(--border-color);
+
+  &:first-child {
+    border-top: 0;
   }
-  
-  .skill-category h3 {
-    color: var(--gray-900);
-    margin-bottom: var(--space-6);
-    padding-bottom: var(--space-3);
-    border-bottom: 2px solid var(--gray-100);
-  }
-  
-  .skills-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-  }
-  
-  .skill-item {
-    background: var(--gray-50);
-    padding: var(--space-4);
-    border-radius: 8px;
-    transition: all 0.3s ease;
-  }
-  
-  .skill-item:hover {
-    background: white;
-    box-shadow: var(--shadow-md);
-    transform: translateX(4px);
-  }
-  
-  .skill-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-3);
-  }
-  
-  .skill-name {
-    font-weight: 600;
-    color: var(--gray-800);
-  }
-  
-  .skill-percentage {
-    font-weight: 500;
-    color: var(--gray-600);
-    font-size: var(--font-size-sm);
-  }
-  
-  .skill-bar {
-    height: 6px;
-    background: var(--gray-200);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-  
-  .skill-progress {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 1s ease-in-out;
-  }
-  
-  .skill-progress.frontend {
-    background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
-  }
-  
-  .skill-progress.backend {
-    background: linear-gradient(135deg, var(--secondary-500), var(--secondary-600));
-  }
-  
-  .skill-progress.tools {
-    background: linear-gradient(135deg, var(--accent-500), var(--accent-600));
-  }
-  
-  .tech-stack {
-    background: var(--gray-50);
-    padding: var(--space-8);
-    border-radius: 16px;
-    height: fit-content;
-  }
-  
-  .tech-stack h3 {
-    color: var(--gray-900);
-    margin-bottom: var(--space-6);
-    text-align: center;
-  }
-  
-  .tech-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-4);
-  }
-  
-  .tech-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-4);
-    background: white;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    text-align: center;
-  }
-  
-  .tech-item:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
-  }
-  
-  .tech-icon {
-    font-size: var(--font-size-2xl);
-    margin-bottom: var(--space-1);
-  }
-  
-  .tech-item span {
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    color: var(--gray-700);
-  }
-  
-  @media (max-width: 768px) {
-    .skills-content {
-      grid-template-columns: 1fr;
-      gap: var(--space-12);
-    }
-    
-    .tech-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
+}
+
+.skill__icon {
+  color: var(--text-muted);
+}
+
+.skill__name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+  color: var(--text-strong);
+}
+
+.skill__tier {
+  flex-shrink: 0;
+}
+
+// Near-black brand marks would vanish on dark cards when hover swaps them to their brand colour.
+:host-context(.app-dark) .skill--dark-brand ::ng-deep .tech-icon {
+  color: inherit !important;
+}
+
+// Legend ----------------------------------------------------------------------------------------
+.skills-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-8);
+  font-size: var(--fs-sm);
+}
+
+.skills-legend__sep {
+  color: var(--text-subtle);
+}

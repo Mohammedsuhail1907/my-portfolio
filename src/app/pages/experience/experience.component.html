@@ -1,0 +1,87 @@
+<section id="experience" class="section" aria-labelledby="experience-title">
+  <div class="container">
+    <app-section-heading
+      eyebrow="Experience"
+      [title]="'Professional Experience'"
+      titleId="experience-title"
+    />
+
+    <div class="section__body">
+      <div class="experience" appReveal revealStagger>
+        <p-timeline
+          [value]="items()"
+          [align]="align()"
+          layout="vertical"
+          styleClass="experience-timeline"
+        >
+          <ng-template #marker let-item>
+            <span class="experience__marker reveal-item" [style.--i]="item.index">
+              <i class="pi pi-briefcase" aria-hidden="true"></i>
+            </span>
+          </ng-template>
+
+          <ng-template #opposite let-item>
+            <p class="experience__date experience__date--opposite reveal-item" [style.--i]="item.index">
+              {{ formatRange(item) }}
+            </p>
+          </ng-template>
+
+          <ng-template #content let-item>
+            <div class="experience__item reveal-item" [style.--i]="item.index">
+              <p-card class="experience__card hover-lift">
+                <div class="stack experience__body">
+                  <div class="experience__header">
+                    <p class="experience__date experience__date--inline">{{ formatRange(item) }}</p>
+                    <h3 class="experience__role">{{ item.role }}</h3>
+                    <p class="experience__company">
+                      @if (item.url) {
+                        <a
+                          class="experience__company-link"
+                          [href]="item.url"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {{ item.company }}
+                          <i class="pi pi-external-link" aria-hidden="true"></i>
+                          <span class="visually-hidden">(opens in a new tab)</span>
+                        </a>
+                      } @else {
+                        <span class="experience__company-name">{{ item.company }}</span>
+                      }
+                      @if (item.location) {
+                        <span class="experience__separator" aria-hidden="true">&middot;</span>
+                        <span class="experience__location">{{ item.location }}</span>
+                      }
+                    </p>
+                  </div>
+
+                  @if (item.summary) {
+                    <p class="experience__summary">{{ item.summary }}</p>
+                  }
+
+                  @if (item.highlights.length) {
+                    <ul class="experience__highlights" role="list">
+                      @for (highlight of item.highlights; track $index) {
+                        <li>{{ highlight }}</li>
+                      }
+                    </ul>
+                  }
+
+                  @if (item.technologies.length) {
+                    <ul class="cluster experience__tech" role="list" aria-label="Technologies">
+                      @for (tech of item.technologies; track $index) {
+                        <li>
+                          <p-tag [value]="tech" severity="secondary" [rounded]="true" />
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+              </p-card>
+            </div>
+          </ng-template>
+        </p-timeline>
+      </div>
+    </div>
+  </div>
+</section>

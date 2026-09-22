@@ -1,75 +1,108 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { CardModule } from 'primeng/card';
+import { TagModule } from 'primeng/tag';
+import { SkillCategory, SkillTier, skillTier } from '../../models/portfolio-data.model';
+import { TECH_ICONS } from '../../data/tech-icons';
+import { RevealDirective } from '../../directives/reveal.directive';
+import { PortfolioDataService } from '../../services/portfolio-data.service';
+import { SectionHeadingComponent } from '../../shared/section-heading/section-heading.component';
+import { TechIconComponent } from '../../shared/tech-icon/tech-icon.component';
 
-interface Skill {
-  name: string;
-  level: number;
-  category: string;
+/** PrimeNG tag severity used to colour each proficiency tier. */
+export type TierSeverity = 'info' | 'success' | 'warn';
+
+const TIER_SEVERITY: Record<SkillTier, TierSeverity> = {
+  Expert: 'info',
+  Advanced: 'success',
+  Intermediate: 'warn',
+};
+
+/** Tiers in descending order, as shown in the legend. */
+const TIERS: SkillTier[] = ['Expert', 'Advanced', 'Intermediate'];
+
+export function tierSeverity(tier: SkillTier): TierSeverity {
+  return TIER_SEVERITY[tier];
 }
 
-interface Technology {
+/**
+ * True for brand marks so dark (e.g. Angular, GitHub) that they would vanish against a dark card
+ * when the row's hover swaps the icon to its brand colour.
+ */
+function hasDarkBrand(iconKey: string | undefined): boolean {
+  const hex = iconKey ? TECH_ICONS[iconKey]?.hex : undefined;
+  if (!hex || !/^#[0-9a-f]{6}$/i.test(hex)) {
+    return false;
+  }
+  const rgb = Number.parseInt(hex.slice(1), 16);
+  const luminance =
+    (0.2126 * ((rgb >> 16) & 255) + 0.7152 * ((rgb >> 8) & 255) + 0.0722 * (rgb & 255)) / 255;
+  return luminance < 0.2;
+}
+
+interface SkillRow {
   name: string;
+  icon?: string;
+  fallbackIcon: string;
+  tier: SkillTier;
+  severity: TierSeverity;
+  darkBrand: boolean;
+}
+
+interface SkillCategoryView {
+  id: string;
+  title: string;
   icon: string;
+  skills: SkillRow[];
 }
 
+interface TierLegendItem {
+  tier: SkillTier;
+  severity: TierSeverity;
+}
+
+/**
+ * Skills section: one card per category with each skill shown as a proficiency tier
+ * (never a percentage or bar), followed by a legend that explains the three tiers.
+ *
+ * Content comes from `PortfolioDataService` (currently backed by `assets/data/portfolio.json`),
+ * so it can be swapped for a real API later without touching this component.
+ */
 @Component({
   selector: 'app-skills',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [CardModule, TagModule, SectionHeadingComponent, TechIconComponent, RevealDirective],
   templateUrl: './skills.component.html',
-  styleUrls: ['./skills.component.scss']
+  styleUrl: './skills.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SkillsComponent {
-  frontendSkills: Skill[] = [
-    { name: 'Angular', level: 95, category: 'frontend' },
-   // { name: 'React', level: 90, category: 'frontend' },
-    { name: 'TypeScript', level: 90, category: 'frontend' },
-    { name: 'JavaScript', level: 95, category: 'frontend' },
-    { name: 'HTML5/CSS3', level: 90, category: 'frontend' },
-    { name: 'BootStrap', level: 85, category: 'frontend' }
-  ];
-  
-  backendSkills: Skill[] = [
-    { name: 'Node.js', level: 88, category: 'backend' },
-    { name: 'Java', level: 50, category: 'backend' },
-    //{ name: 'MongoDB', level: 80, category: 'backend' },
-    { name: 'SQL', level: 85, category: 'backend' },
-    // { name: 'REST APIs', level: 90, category: 'backend' },
-    // { name: 'GraphQL', level: 70, category: 'backend' }
-  ];
-  
-  toolsSkills: Skill[] = [
-    { name: 'Git', level: 92, category: 'tools' },
-    { name: 'Git Hub', level: 90, category: 'tools' },
-     { name: 'Postman', level: 75, category: 'tools' },
-    // { name: 'AWS', level: 70, category: 'tools' },
-    // { name: 'Figma', level: 85, category: 'tools' },
-    // { name: 'Jest', level: 80, category: 'tools' },
-    //{ name: 'Webpack', level: 75, category: 'tools' }
-  ];
-  
-  // technologies: Technology[] = [
-  //   { name: 'Angular', icon: '🅰️' },
-  //  // { name: 'React', icon: '⚛️' },
-  //   { name: 'Node.js', icon: '🟢' },
-  //   { name: 'TypeScript', icon: '🔷' },
-  //   //{ name: 'MongoDB', icon: '🍃' },
-  //   //{ name: 'Docker', icon: '🐳' },
-  //   //{ name: 'AWS', icon: '☁️' },
-  //   { name: 'Git', icon: '📁' },
-  //   //{ name: 'Figma', icon: '🎨' }
-  // ];
+  private readonly portfolioData = inject(PortfolioDataService);
 
-  technologies: Technology[] = [
-    { name: 'Angular', icon: '🅰️' },
-    { name: 'Node.js', icon: '🟢' },
-    { name: 'TypeScript', icon: '🔷' },
-    { name: 'JavaScript', icon: '✨' },
-    { name: 'Java', icon: '☕' },
-    { name: 'SQL', icon: '🗄️' },
-    { name: 'Git', icon: '📁' },
-    { name: 'GitHub', icon: '🐙' },
-    { name: 'Postman', icon: '📬' },
-  ];
-  
+  private readonly skillCategories = toSignal(this.portfolioData.getSkillCategories(), {
+    initialValue: [] as SkillCategory[],
+  });
+
+  protected readonly categories = computed<SkillCategoryView[]>(() =>
+    this.skillCategories().map((category) => ({
+      id: category.id,
+      title: category.title,
+      icon: category.icon,
+      skills: category.skills.map((skill) => {
+        const tier = skillTier(skill.level);
+        return {
+          name: skill.name,
+          icon: skill.icon,
+          fallbackIcon: skill.fallbackIcon ?? 'pi pi-code',
+          tier,
+          severity: tierSeverity(tier),
+          darkBrand: hasDarkBrand(skill.icon),
+        };
+      }),
+    })),
+  );
+
+  protected readonly tiers: TierLegendItem[] = TIERS.map((tier) => ({
+    tier,
+    severity: tierSeverity(tier),
+  }));
 }

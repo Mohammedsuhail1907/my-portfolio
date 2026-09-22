@@ -1,22 +1,109 @@
-<header [class]="'header ' + (isScrolled ? 'scrolled' : '')">
-  <nav class="nav container">
-    <div class="logo">
-      <a (click)="scrollToSection('home')" style="cursor: pointer;">Mohammed Suhail</a>
-    </div>
+<header class="site-header" [class.site-header--scrolled]="scrolled()">
+  <nav class="container site-header__nav" aria-label="Primary">
+    <button type="button" class="site-header__brand" (click)="navigation.scrollTo('home')">
+      {{ site.name }}
+    </button>
 
-    <!-- header.component.html -->
-    <ul [class]="'nav-menu ' + (isMenuOpen ? 'active' : '')">
-      <li><a (click)="scrollToSection('home')" style="cursor: pointer;">Home</a></li>
-      <li><a (click)="scrollToSection('about')" style="cursor: pointer;">About</a></li>
-      <li><a (click)="scrollToSection('skills')" style="cursor: pointer;">Skills</a></li>
-      <li><a (click)="scrollToSection('contact')" style="cursor: pointer;">Contact</a></li>
+    <ul class="site-header__links" role="list">
+      @for (item of navigation.items; track item.id) {
+        <li>
+          <button
+            type="button"
+            class="site-header__link"
+            [class.is-active]="isActive(item.id)"
+            [attr.aria-current]="isActive(item.id) ? 'location' : null"
+            (click)="navigation.scrollTo(item.id)"
+          >
+            {{ item.label }}
+          </button>
+        </li>
+      }
     </ul>
 
+    <div class="site-header__actions">
+      <button
+        type="button"
+        pButton
+        class="site-header__action"
+        [icon]="themeIcon()"
+        [rounded]="true"
+        [text]="true"
+        severity="secondary"
+        [attr.aria-label]="themeLabel()"
+        [pTooltip]="themeLabel()"
+        tooltipPosition="bottom"
+        (click)="theme.toggle()"
+      ></button>
 
-    <div class="hamburger" (click)="toggleMenu()" [class.active]="isMenuOpen">
-      <span></span>
-      <span></span>
-      <span></span>
+      <button
+        type="button"
+        pButton
+        class="site-header__action site-header__menu"
+        icon="pi pi-bars"
+        [rounded]="true"
+        [text]="true"
+        severity="secondary"
+        aria-label="Open menu"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="site-drawer"
+        (click)="openMenu()"
+      ></button>
     </div>
   </nav>
 </header>
+
+<!-- Rendered outside <header>: its backdrop-filter would otherwise become the containing block
+     for the drawer's fixed-position mask. -->
+<p-drawer
+  id="site-drawer"
+  [(visible)]="menuOpen"
+  position="right"
+  [modal]="true"
+  [blockScroll]="true"
+  [closeOnEscape]="true"
+  [dismissible]="true"
+  styleClass="site-drawer"
+  ariaCloseLabel="Close menu"
+  (onShow)="onDrawerShow()"
+  (onHide)="onDrawerHide()"
+>
+  <ng-template #header>
+    <span class="site-drawer__brand">{{ site.name }}</span>
+  </ng-template>
+
+  <div class="site-drawer__body">
+    <nav aria-label="Menu">
+      <ul class="site-drawer__list" role="list" [class.is-open]="drawerShown()">
+        @for (item of navigation.items; track item.id) {
+          <li class="site-drawer__item" [style.--i]="$index">
+            <button
+              type="button"
+              class="site-drawer__link"
+              [class.is-active]="isActive(item.id)"
+              [attr.aria-current]="isActive(item.id) ? 'location' : null"
+              (click)="navigation.scrollTo(item.id); closeMenu()"
+            >
+              {{ item.label }}
+              <i class="pi pi-arrow-right site-drawer__link-icon" aria-hidden="true"></i>
+            </button>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="site-drawer__theme">
+      <span class="site-drawer__theme-label">Theme</span>
+      <span class="site-drawer__theme-value">{{ theme.isDark() ? 'Dark' : 'Light' }}</span>
+      <button
+        type="button"
+        pButton
+        [icon]="themeIcon()"
+        [rounded]="true"
+        [text]="true"
+        severity="secondary"
+        [attr.aria-label]="themeLabel()"
+        (click)="theme.toggle()"
+      ></button>
+    </div>
+  </div>
+</p-drawer>

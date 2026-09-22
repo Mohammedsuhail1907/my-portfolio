@@ -1,73 +1,54 @@
-<section id="skills" class="section">
-    <div class="container">
-      <h2 class="section-title">Skills & Technologies</h2>
-      
-      <div class="skills-content">
-        <div class="skills-categories">
-          <div class="skill-category">
-            <h3>Frontend Development</h3>
-            <div class="skills-list">
-              <div *ngFor="let skill of frontendSkills" class="skill-item">
-                <div class="skill-info">
-                  <span class="skill-name">{{ skill.name }}</span>
-                  <span class="skill-percentage">{{ skill.level }}%</span>
-                </div>
-                <div class="skill-bar">
-                  <div 
-                    class="skill-progress frontend" 
-                    [style.width.%]="skill.level">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="skill-category">
-            <h3>Backend Development</h3>
-            <div class="skills-list">
-              <div *ngFor="let skill of backendSkills" class="skill-item">
-                <div class="skill-info">
-                  <span class="skill-name">{{ skill.name }}</span>
-                  <span class="skill-percentage">{{ skill.level }}%</span>
-                </div>
-                <div class="skill-bar">
-                  <div 
-                    class="skill-progress backend" 
-                    [style.width.%]="skill.level">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="skill-category">
-            <h3>Tools & Others</h3>
-            <div class="skills-list">
-              <div *ngFor="let skill of toolsSkills" class="skill-item">
-                <div class="skill-info">
-                  <span class="skill-name">{{ skill.name }}</span>
-                  <span class="skill-percentage">{{ skill.level }}%</span>
-                </div>
-                <div class="skill-bar">
-                  <div 
-                    class="skill-progress tools" 
-                    [style.width.%]="skill.level">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-       
-        <div class="tech-stack">
-          <h3>Technology Stack</h3>
-          <div class="tech-grid">
-            <div *ngFor="let tech of technologies" class="tech-item">
-              <div class="tech-icon">{{ tech.icon }}</div>
-              <span>{{ tech.name }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+<section id="skills" class="section section--bordered" aria-labelledby="skills-title">
+  <div class="container">
+    <div appReveal>
+      <app-section-heading eyebrow="Skills" title="Skills &amp; Technologies" titleId="skills-title" />
     </div>
-  </section>
+
+    <div class="section__body">
+      <ul class="grid-auto skills-grid" role="list" appReveal revealStagger>
+        @for (category of categories(); track category.id) {
+          <li class="skills-grid__item reveal-item" [style.--i]="$index">
+            <p-card class="skill-card hover-lift">
+              <div class="skill-card__head">
+                <span class="skill-card__icon">
+                  <i [class]="category.icon" aria-hidden="true"></i>
+                </span>
+                <h3 class="skill-card__title">{{ category.title }}</h3>
+              </div>
+
+              <ul class="skill-list stack" role="list">
+                @for (skill of category.skills; track skill.name) {
+                  <li class="skill tech-brand-on-hover" [class.skill--dark-brand]="skill.darkBrand">
+                    <app-tech-icon
+                      class="skill__icon"
+                      [name]="skill.icon"
+                      [fallback]="skill.fallbackIcon"
+                      [size]="18"
+                    />
+                    <span class="skill__name">{{ skill.name }}</span>
+                    <p-tag
+                      class="skill__tier"
+                      [value]="skill.tier"
+                      [severity]="skill.severity"
+                      [rounded]="true"
+                    />
+                  </li>
+                }
+              </ul>
+            </p-card>
+          </li>
+        }
+      </ul>
+
+      <p class="skills-legend text-muted" appReveal="fade" [revealDelay]="240">
+        <span class="visually-hidden">Proficiency levels:</span>
+        @for (item of tiers; track item.tier) {
+          <p-tag [value]="item.tier" [severity]="item.severity" [rounded]="true" />
+          @if (!$last) {
+            <span class="skills-legend__sep" aria-hidden="true">·</span>
+          }
+        }
+      </p>
+    </div>
+  </div>
+</section>
