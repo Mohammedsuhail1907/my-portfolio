@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { SITE } from '../../config/site.config';
 import { RevealDirective } from '../../directives/reveal.directive';
 import { NavigationService } from '../../services/navigation.service';
@@ -11,15 +10,19 @@ const FOOTER_SERVICES: readonly string[] = [
   'Mobile Apps',
 ];
 
+/**
+ * Site footer. The "Quick Links" scroll within the page via `NavigationService.scrollTo` (plain
+ * buttons, no URL change); the "Connect" links are real external hyperlinks and stay as `<a>`.
+ */
 @Component({
   selector: 'app-footer',
-  imports: [RouterLink, RevealDirective],
+  imports: [RevealDirective],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterComponent {
-  private readonly navigation = inject(NavigationService);
+  protected readonly navigation = inject(NavigationService);
 
   protected readonly site = SITE;
   /** Navigable home sections (hidden sections are already filtered out by the service). */

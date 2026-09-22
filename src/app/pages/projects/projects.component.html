@@ -6,14 +6,14 @@
       <div class="projects-filter" appReveal="fade">
         <p-selectbutton
           class="projects-filter__control"
-          [options]="categories"
+          [options]="categories()"
           [ngModel]="activeFilter()"
           (ngModelChange)="setFilter($event)"
           [allowEmpty]="false"
           aria-label="Filter projects by category"
         />
         <p class="visually-hidden" role="status" aria-live="polite">
-          Showing {{ filtered().length }} of {{ projects.length }} projects
+          Showing {{ filtered().length }} of {{ projects().length }} projects
         </p>
       </div>
 

@@ -8,11 +8,15 @@
         <p class="lead text-muted hero__tagline enter" [style.--i]="3">{{ site.tagline }}</p>
 
         <ul role="list" class="cluster hero__tech enter" aria-label="Core technologies" [style.--i]="4">
-          @for (skill of highlights; track skill.name) {
+          @for (skill of highlights(); track skill.name) {
             <li>
               <p-chip>
                 <span class="chip-body">
-                  <app-tech-icon [name]="skill.icon" fallback="pi pi-database" [size]="16" />
+                  <app-tech-icon
+                    [name]="skill.icon"
+                    [fallback]="skill.fallbackIcon ?? 'pi pi-code'"
+                    [size]="16"
+                  />
                   <span>{{ skill.name }}</span>
                 </span>
               </p-chip>
@@ -21,22 +25,22 @@
         </ul>
 
         <div class="cluster hero__actions enter" [style.--i]="5">
-          <a
+          <button
+            type="button"
             pButton
-            routerLink="/home"
-            [fragment]="'contact'"
+            (click)="navigation.scrollTo('contact')"
             label="Get In Touch"
             icon="pi pi-arrow-right"
             iconPos="right"
-          ></a>
-          <a
+          ></button>
+          <button
+            type="button"
             pButton
             [outlined]="true"
             severity="secondary"
-            routerLink="/home"
-            [fragment]="secondaryAction.fragment"
+            (click)="navigation.scrollTo(secondaryAction.sectionId)"
             [label]="secondaryAction.label"
-          ></a>
+          ></button>
         </div>
 
         <div class="cluster hero__meta-row enter" [style.--i]="6">
@@ -82,13 +86,13 @@
     </div>
   </div>
 
-  <a
-    routerLink="/home"
-    [fragment]="'about'"
+  <button
+    type="button"
     class="hero__scroll enter enter--fade"
     [style.--i]="8"
+    (click)="navigation.scrollTo('about')"
     aria-label="Scroll to the About section"
   >
     <i class="pi pi-arrow-down" aria-hidden="true"></i>
-  </a>
+  </button>
 </section>

@@ -1,30 +1,20 @@
 import { Routes } from '@angular/router';
 import { SITE } from './config/site.config';
 
-const brand = `${SITE.name} — ${SITE.role}`;
-
+/**
+ * A single route.
+ *
+ * This is a one-page portfolio — every section lives on this one page and section navigation
+ * scrolls in place (see NavigationService.scrollTo); there is nothing to route BETWEEN. The
+ * route below exists only so the page can still be lazy-loaded and the browser tab gets a title;
+ * it is the site root and never shows up in the address bar. Any other path (an old bookmark to
+ * a since-removed page, a typo) redirects back here rather than 404ing.
+ */
 export const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
-    path: 'home',
-    title: brand,
+    path: '',
+    title: `${SITE.name} — ${SITE.role}`,
     loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
   },
-  {
-    path: 'about',
-    title: `About — ${brand}`,
-    loadComponent: () => import('./pages/about/about.component').then((m) => m.AboutComponent),
-  },
-  {
-    path: 'skills',
-    title: `Skills — ${brand}`,
-    loadComponent: () => import('./pages/skills/skills.component').then((m) => m.SkillsComponent),
-  },
-  {
-    path: 'contact',
-    title: `Contact — ${brand}`,
-    loadComponent: () =>
-      import('./pages/contact/contact.component').then((m) => m.ContactComponent),
-  },
-  { path: '**', redirectTo: 'home' },
+  { path: '**', redirectTo: '' },
 ];

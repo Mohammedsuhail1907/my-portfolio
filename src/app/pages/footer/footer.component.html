@@ -12,9 +12,13 @@
           <ul class="site-footer__list" role="list">
             @for (link of links; track link.id) {
               <li>
-                <a routerLink="/home" [fragment]="link.id" class="site-footer__link link-underline">
+                <button
+                  type="button"
+                  class="site-footer__link link-underline"
+                  (click)="navigation.scrollTo(link.id)"
+                >
                   {{ link.label }}
-                </a>
+                </button>
               </li>
             }
           </ul>
@@ -54,10 +58,10 @@
 
     <div class="site-footer__bottom">
       <p class="site-footer__copyright">&copy; {{ year }} {{ site.name }}. All rights reserved.</p>
-      <a routerLink="/home" [fragment]="'home'" class="site-footer__top">
+      <button type="button" class="site-footer__top" (click)="navigation.scrollTo('home')">
         <i class="pi pi-chevron-up" aria-hidden="true"></i>
         Back to top
-      </a>
+      </button>
     </div>
   </div>
 </footer>

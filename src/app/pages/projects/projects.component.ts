@@ -1,20 +1,23 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TagModule } from 'primeng/tag';
-import { PROJECTS, PROJECT_CATEGORIES, Project } from '../../data/projects.data';
+import { Project } from '../../models/portfolio-data.model';
 import { RevealDirective } from '../../directives/reveal.directive';
+import { PortfolioDataService } from '../../services/portfolio-data.service';
 import { SectionHeadingComponent } from '../../shared/section-heading/section-heading.component';
 
 /**
  * Projects section: a category filter, a responsive card grid and a detail dialog.
  *
- * Content comes from `app/data/projects.data.ts`; optional fields (`role`, `features`, `impact`,
- * `demoUrl`, `githubUrl`) render only when present. HomeComponent mounts this section only when
- * `SITE.features.projects` is enabled.
+ * Content comes from `PortfolioDataService` (currently backed by `assets/data/portfolio.json`,
+ * still holding clearly-marked **placeholder** sample data — see that file). Optional fields
+ * (`role`, `features`, `impact`, `demoUrl`, `githubUrl`) render only when present. HomeComponent
+ * mounts this section only when `SITE.features.projects` is enabled.
  */
 @Component({
   selector: 'app-projects',
@@ -33,15 +36,20 @@ import { SectionHeadingComponent } from '../../shared/section-heading/section-he
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectsComponent {
-  protected readonly categories = PROJECT_CATEGORIES;
-  protected readonly projects = PROJECTS;
+  private readonly portfolioData = inject(PortfolioDataService);
 
-  protected readonly activeFilter = signal<string>(PROJECT_CATEGORIES[0]);
+  protected readonly categories = toSignal(this.portfolioData.getProjectCategories(), {
+    initialValue: [] as string[],
+  });
+  protected readonly projects = toSignal(this.portfolioData.getProjects(), {
+    initialValue: [] as Project[],
+  });
+
+  protected readonly activeFilter = signal<string>('All');
   protected readonly filtered = computed(() => {
     const category = this.activeFilter();
-    return category === 'All'
-      ? this.projects
-      : this.projects.filter((project) => project.category === category);
+    const projects = this.projects();
+    return category === 'All' ? projects : projects.filter((project) => project.category === category);
   });
 
   protected readonly selected = signal<Project | null>(null);

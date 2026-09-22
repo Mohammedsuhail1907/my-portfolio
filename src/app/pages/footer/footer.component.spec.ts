@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
 import { SITE } from '../../config/site.config';
 import { NavigationService } from '../../services/navigation.service';
 import { FooterComponent } from './footer.component';
@@ -7,16 +6,17 @@ import { FooterComponent } from './footer.component';
 describe('FooterComponent', () => {
   let fixture: ComponentFixture<FooterComponent>;
   let element: HTMLElement;
+  let navigation: NavigationService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [FooterComponent],
-      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(FooterComponent);
     fixture.detectChanges();
     element = fixture.nativeElement;
+    navigation = TestBed.inject(NavigationService);
   });
 
   it('should create', () => {
@@ -30,13 +30,25 @@ describe('FooterComponent', () => {
     expect(copyright).toContain(SITE.name);
   });
 
-  it('renders quick links for every navigable section and a back-to-top link', () => {
-    const items = TestBed.inject(NavigationService).items;
+  it('renders a quick-link button for every navigable section that scrolls without changing the URL', () => {
+    const items = navigation.items;
+    const scrollSpy = spyOn(navigation, 'scrollTo');
+    const before = location.href;
+
     const quick = Array.from(
-      element.querySelectorAll<HTMLAnchorElement>('nav[aria-labelledby="footer-links-title"] a'),
+      element.querySelectorAll<HTMLButtonElement>('nav[aria-labelledby="footer-links-title"] button'),
     );
-    expect(quick.map((a) => a.getAttribute('href'))).toEqual(items.map((i) => `/home#${i.id}`));
-    expect(element.querySelector('.site-footer__top')?.getAttribute('href')).toBe('/home#home');
+    expect(quick.map((btn) => btn.textContent?.trim())).toEqual(items.map((i) => i.label));
+
+    quick[0]?.click();
+    expect(scrollSpy).toHaveBeenCalledWith(items[0].id);
+    expect(location.href).toBe(before);
+  });
+
+  it('scrolls to home when "Back to top" is clicked', () => {
+    const scrollSpy = spyOn(navigation, 'scrollTo');
+    element.querySelector<HTMLButtonElement>('.site-footer__top')?.click();
+    expect(scrollSpy).toHaveBeenCalledWith('home');
   });
 
   it('marks external links as noopener', () => {

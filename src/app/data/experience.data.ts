@@ -12,7 +12,7 @@
  *   location: 'Chennai, India',
  *   summary: 'One sentence on the team or product.',
  *   highlights: ['Built X that did Y', 'Reduced Z by N%'],
- *   technologies: ['Angular', 'Node.js', 'SQL'],
+ *   technologies: ['Angular', '.NET', 'SQL'],
  * }
  */
 export interface ExperienceEntry {

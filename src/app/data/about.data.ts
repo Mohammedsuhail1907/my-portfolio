@@ -12,16 +12,16 @@ export interface Service {
 }
 
 export const ABOUT_INTRO = {
-  lead: "I'm a passionate full-stack developer with over 1 years of experience creating digital solutions that make a difference.",
+  lead: "I'm a passionate full-stack developer with over 2 years of experience creating digital solutions that make a difference.",
   paragraphs: [
     "My journey in web development started with a curiosity about how things work on the internet. Since then, I've evolved into a developer who loves creating efficient, scalable, and user-friendly applications.",
-    "I specialize in modern JavaScript frameworks, particularly Angular, along with Node.js for backend development. I'm always eager to learn new technologies and stay updated with the latest industry trends.",
+    "I specialize in modern JavaScript frameworks, particularly Angular, along with .NET for backend development. I'm always eager to learn new technologies and stay updated with the latest industry trends.",
   ],
 };
 
 export const STATS: Stat[] = [
   { value: '5+', label: 'Projects Completed' },
-  { value: '1+', label: 'Years Experience' },
+  { value: '2+', label: 'Years Experience' },
 ];
 
 export const SERVICES: Service[] = [

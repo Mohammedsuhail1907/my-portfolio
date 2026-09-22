@@ -1,22 +1,35 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
 import { SITE } from '../../config/site.config';
-import { HERO_HIGHLIGHTS } from '../../data/skills.data';
+import { Skill } from '../../models/portfolio-data.model';
+import { NavigationService } from '../../services/navigation.service';
+import { PortfolioDataService } from '../../services/portfolio-data.service';
 import { HeroComponent } from './hero.component';
+
+const FAKE_HIGHLIGHTS: Skill[] = [
+  { name: 'Angular', level: 95, icon: 'angular' },
+  { name: 'C#', level: 75 },
+];
+
+const FAKE_PORTFOLIO_DATA: Partial<PortfolioDataService> = {
+  getHeroHighlights: () => of(FAKE_HIGHLIGHTS),
+};
 
 describe('HeroComponent', () => {
   let fixture: ComponentFixture<HeroComponent>;
   let element: HTMLElement;
+  let navigation: NavigationService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HeroComponent],
-      providers: [provideRouter([])],
+      providers: [{ provide: PortfolioDataService, useValue: FAKE_PORTFOLIO_DATA }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeroComponent);
     fixture.detectChanges();
     element = fixture.nativeElement;
+    navigation = TestBed.inject(NavigationService);
   });
 
   it('should create', () => {
@@ -29,15 +42,21 @@ describe('HeroComponent', () => {
     expect(element.querySelector('.hero__tagline')?.textContent?.trim()).toBe(SITE.tagline);
   });
 
-  it('links the primary call to action to the contact section', () => {
-    const cta = Array.from(element.querySelectorAll<HTMLAnchorElement>('a[pButton]')).find(
-      (a) => a.textContent?.includes('Get In Touch'),
+  it('scrolls to the contact section on click, without touching the URL', () => {
+    const scrollSpy = spyOn(navigation, 'scrollTo');
+    const before = location.href;
+
+    const cta = Array.from(element.querySelectorAll<HTMLButtonElement>('button[pButton]')).find(
+      (b) => b.textContent?.includes('Get In Touch'),
     );
-    expect(cta?.getAttribute('href')).toBe('/home#contact');
+    cta?.click();
+
+    expect(scrollSpy).toHaveBeenCalledWith('contact');
+    expect(location.href).toBe(before);
   });
 
-  it('renders one chip per highlighted technology and every social link', () => {
-    expect(element.querySelectorAll('.hero__tech li').length).toBe(HERO_HIGHLIGHTS.length);
+  it('renders one chip per highlighted technology (from the data service) and every social link', () => {
+    expect(element.querySelectorAll('.hero__tech li').length).toBe(FAKE_HIGHLIGHTS.length);
     const socials = Array.from(element.querySelectorAll<HTMLAnchorElement>('.hero__socials a'));
     expect(socials.map((a) => a.getAttribute('href'))).toEqual(SITE.socials.map((s) => s.url));
     expect(socials.every((a) => a.getAttribute('rel') === 'noopener noreferrer')).toBeTrue();

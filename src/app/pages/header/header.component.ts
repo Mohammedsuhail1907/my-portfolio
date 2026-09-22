@@ -7,7 +7,6 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { TooltipModule } from 'primeng/tooltip';
@@ -20,12 +19,13 @@ const SCROLLED_AFTER = 8;
 
 /**
  * Fixed site header: brand, primary section links (desktop), theme toggle and a right-hand
- * drawer menu for small screens. Links are real router links (`/home#section`); scroll-spy
+ * drawer menu for small screens. Links are plain buttons that call `NavigationService.scrollTo`
+ * — this is a single-page app, so nothing here is a real hyperlink or changes the URL. Scroll-spy
  * state comes from NavigationService and the colour scheme from ThemeService.
  */
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, ButtonModule, DrawerModule, TooltipModule],
+  imports: [ButtonModule, DrawerModule, TooltipModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,7 +61,7 @@ export class HeaderComponent {
     this.menuOpen.set(true);
   }
 
-  /** Closes the drawer (link clicks); the router link navigation still happens. */
+  /** Closes the drawer (link clicks). */
   protected closeMenu(): void {
     this.menuOpen.set(false);
     this.drawerShown.set(false);

@@ -2,7 +2,8 @@
 
 Personal portfolio built with **Angular 20**, **PrimeNG 20** and a small custom SCSS design system.
 Single-page layout (hero → about → skills → contact) with smooth section navigation, scroll-reveal
-animations, light/dark theme and an EmailJS-powered contact form.
+animations, light/dark theme and an EmailJS-powered contact form. There is exactly one route (the
+root) — section links scroll the page in place and never change the URL.
 
 ## Requirements
 
@@ -32,18 +33,22 @@ src/
     _motion.scss             Reveal, entrance, hover, route + theme transitions, reduced motion
     _primeng.scss            Small PrimeNG adjustments
   app/
-    app.config.ts            Router (anchor scrolling, view transitions), PrimeNG theme, Toast
+    app.routes.ts            One route (the root) that lazy-loads the page; '**' redirects to it
+    app.config.ts            Router, HttpClient, PrimeNG theme, Toast
     config/site.config.ts    Name, role, contact details, social links, EmailJS keys, feature flags
     config/app.preset.ts     PrimeNG Aura preset tuned to the design tokens
-    data/                    Editable content: about, skills, experience, projects, tech icons
-    services/                ThemeService (light/dark), NavigationService (sections, scroll-spy)
+    models/                  Skill/Project/PortfolioData types shared by the service and components
+    data/                    Editable content that isn't Skills/Projects: about, experience, tech icons
+    services/                PortfolioDataService (skills/projects), ThemeService (light/dark),
+                             NavigationService (in-page scroll, scroll-spy — never touches the URL)
     directives/              RevealDirective (IntersectionObserver reveal-on-scroll)
     shared/                  SectionHeading, TechIcon
     pages/                   header, hero, about, experience, skills, projects, contact, footer, home
   assets/
+    data/portfolio.json      Skills and Projects content (see PortfolioDataService)
     fonts/                   Inter Variable (latin), self-hosted
     images/                  portrait.jpg is the rendered hero image
-  _redirects                 Netlify SPA fallback (copied to the build output)
+  _redirects                 Static-host SPA fallback (copied to the build output; see Deployment)
 ```
 
 ## Editing content
@@ -52,12 +57,18 @@ Everything visible on the site is data, not markup:
 
 - **Identity & contact** — `src/app/config/site.config.ts` (`SITE`).
 - **About** — `src/app/data/about.data.ts` (intro paragraphs, stats, services).
-- **Skills** — `src/app/data/skills.data.ts`. Levels are shown as tiers (Expert ≥ 90, Advanced ≥ 80,
-  otherwise Intermediate). Brand icons come from `tech-icons.ts` (Simple Icons, CC0).
+- **Skills & Projects** — `src/assets/data/portfolio.json`, read through `PortfolioDataService`
+  (`getSkillCategories()`, `getHeroHighlights()`, `getProjectCategories()`, `getProjects()`).
+  Components never read the file directly, so pointing the service at a real API later is a
+  one-line change (swap the `http.get` URL) with no component changes.
+  - Skill levels (0–100) are shown as tiers (Expert ≥ 90, Advanced ≥ 80, otherwise Intermediate),
+    never as a raw percentage. Brand icons come from `tech-icons.ts` (Simple Icons, CC0); a skill
+    with no brand mark (e.g. C#, which Simple Icons doesn't publish) sets `fallbackIcon` to a
+    PrimeIcons class instead.
+  - Projects currently holds clearly-marked **placeholder** sample data. Replace `projects.items`
+    with real work, then set `SITE.features.projects = true`.
 - **Experience** — `src/app/data/experience.data.ts`. The timeline section and its navigation link
   appear automatically once the array has entries.
-- **Projects** — `src/app/data/projects.data.ts` currently holds clearly-marked **placeholder**
-  sample data. Replace it with real projects, then set `SITE.features.projects = true`.
 
 ## Theme
 

@@ -1,6 +1,7 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideRouter } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { HomeComponent } from './home.component';
 
@@ -10,7 +11,14 @@ describe('HomeComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
-      providers: [provideRouter([]), provideNoopAnimations(), MessageService],
+      providers: [
+        // Hero and Skills read PortfolioDataService, which needs HttpClient. The testing backend
+        // intercepts that request; this test only checks section order, so it is never flushed.
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideNoopAnimations(),
+        MessageService,
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HomeComponent);

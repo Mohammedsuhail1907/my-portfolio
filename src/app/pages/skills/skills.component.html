@@ -6,7 +6,7 @@
 
     <div class="section__body">
       <ul class="grid-auto skills-grid" role="list" appReveal revealStagger>
-        @for (category of categories; track category.id) {
+        @for (category of categories(); track category.id) {
           <li class="skills-grid__item reveal-item" [style.--i]="$index">
             <p-card class="skill-card hover-lift">
               <div class="skill-card__head">
@@ -22,7 +22,7 @@
                     <app-tech-icon
                       class="skill__icon"
                       [name]="skill.icon"
-                      fallback="pi pi-database"
+                      [fallback]="skill.fallbackIcon"
                       [size]="18"
                     />
                     <span class="skill__name">{{ skill.name }}</span>

@@ -10,7 +10,7 @@ import { ProjectsComponent } from '../projects/projects.component';
 import { SkillsComponent } from '../skills/skills.component';
 
 /**
- * The single-page home route: composes every section in order and starts the scroll-spy that
+ * The single page of this app: composes every section in order and starts the scroll-spy that
  * keeps the header's active link in sync. Optional sections render only when they have content
  * (Experience) or are enabled (Projects) — see app/config/site.config.ts.
  */

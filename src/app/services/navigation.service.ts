@@ -4,14 +4,20 @@ import { SectionDef, homeSections } from '../config/site.config';
 /**
  * Section navigation for the single-page layout.
  *
+ * This app has exactly one route (the root). Every "navigation" link therefore just scrolls the
+ * current page to a section's element — it is a plain button click, not a Router navigation or a
+ * URL fragment, so the address bar always stays at the site root (see AppComponent /
+ * app.routes.ts). `scrollTo` accounts for the fixed header itself, since there is no
+ * router-driven anchor scrolling to do it for us.
+ *
  * - `items` are the navigable sections (hidden sections are excluded automatically).
  * - `activeSection` is kept in sync with the section currently under the header (scroll-spy);
  *   HomeComponent calls `observe()` after its sections render.
- * - Links themselves are plain router links (`routerLink="/home" [fragment]="id"`); the router's
- *   anchor scrolling plus `scroll-padding-top` handle the actual smooth scroll and header offset.
  */
 /** Distance below the header at which the scroll-spy probe line sits. */
 const PROBE_OFFSET = 32;
+/** Extra breathing room below the header when landing on a section. */
+const SCROLL_GAP = 16;
 
 @Injectable({ providedIn: 'root' })
 export class NavigationService implements OnDestroy {
@@ -77,15 +83,20 @@ export class NavigationService implements OnDestroy {
     }
   }
 
-  /** Programmatic smooth scroll to a section (used after the mobile drawer closes). */
+  /**
+   * Scroll to a section, clearing the fixed header. This is the ONLY section-navigation
+   * mechanism in the app — it never touches `location` (no path, no `#fragment`, no history
+   * entry), which is what keeps the browser's address bar unchanged while navigating.
+   */
   scrollTo(id: string): void {
     const element = this.document.getElementById(id);
     if (!element) {
       return;
     }
+    const top = element.getBoundingClientRect().top + window.scrollY - this.headerHeight() - SCROLL_GAP;
     const reduceMotion =
       typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    element.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? 'auto' : 'smooth' });
   }
 
   /** Current header height in px, read from the `--header-h` token. */

@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
-import { SKILL_CATEGORIES, skillTier, type SkillTier } from '../../data/skills.data';
+import { SkillCategory, SkillTier, skillTier } from '../../models/portfolio-data.model';
 import { TECH_ICONS } from '../../data/tech-icons';
 import { RevealDirective } from '../../directives/reveal.directive';
+import { PortfolioDataService } from '../../services/portfolio-data.service';
 import { SectionHeadingComponent } from '../../shared/section-heading/section-heading.component';
 import { TechIconComponent } from '../../shared/tech-icon/tech-icon.component';
 
@@ -24,8 +26,8 @@ export function tierSeverity(tier: SkillTier): TierSeverity {
 }
 
 /**
- * True for brand marks so dark (e.g. Angular, GitHub, OpenJDK) that they would vanish against a
- * dark card when the row's hover swaps the icon to its brand colour.
+ * True for brand marks so dark (e.g. Angular, GitHub) that they would vanish against a dark card
+ * when the row's hover swaps the icon to its brand colour.
  */
 function hasDarkBrand(iconKey: string | undefined): boolean {
   const hex = iconKey ? TECH_ICONS[iconKey]?.hex : undefined;
@@ -41,6 +43,7 @@ function hasDarkBrand(iconKey: string | undefined): boolean {
 interface SkillRow {
   name: string;
   icon?: string;
+  fallbackIcon: string;
   tier: SkillTier;
   severity: TierSeverity;
   darkBrand: boolean;
@@ -61,6 +64,9 @@ interface TierLegendItem {
 /**
  * Skills section: one card per category with each skill shown as a proficiency tier
  * (never a percentage or bar), followed by a legend that explains the three tiers.
+ *
+ * Content comes from `PortfolioDataService` (currently backed by `assets/data/portfolio.json`),
+ * so it can be swapped for a real API later without touching this component.
  */
 @Component({
   selector: 'app-skills',
@@ -70,21 +76,30 @@ interface TierLegendItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SkillsComponent {
-  protected readonly categories: SkillCategoryView[] = SKILL_CATEGORIES.map((category) => ({
-    id: category.id,
-    title: category.title,
-    icon: category.icon,
-    skills: category.skills.map((skill) => {
-      const tier = skillTier(skill.level);
-      return {
-        name: skill.name,
-        icon: skill.icon,
-        tier,
-        severity: tierSeverity(tier),
-        darkBrand: hasDarkBrand(skill.icon),
-      };
-    }),
-  }));
+  private readonly portfolioData = inject(PortfolioDataService);
+
+  private readonly skillCategories = toSignal(this.portfolioData.getSkillCategories(), {
+    initialValue: [] as SkillCategory[],
+  });
+
+  protected readonly categories = computed<SkillCategoryView[]>(() =>
+    this.skillCategories().map((category) => ({
+      id: category.id,
+      title: category.title,
+      icon: category.icon,
+      skills: category.skills.map((skill) => {
+        const tier = skillTier(skill.level);
+        return {
+          name: skill.name,
+          icon: skill.icon,
+          fallbackIcon: skill.fallbackIcon ?? 'pi pi-code',
+          tier,
+          severity: tierSeverity(tier),
+          darkBrand: hasDarkBrand(skill.icon),
+        };
+      }),
+    })),
+  );
 
   protected readonly tiers: TierLegendItem[] = TIERS.map((tier) => ({
     tier,

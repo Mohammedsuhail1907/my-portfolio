@@ -1,19 +1,21 @@
 <header class="site-header" [class.site-header--scrolled]="scrolled()">
   <nav class="container site-header__nav" aria-label="Primary">
-    <a routerLink="/home" [fragment]="'home'" class="site-header__brand">{{ site.name }}</a>
+    <button type="button" class="site-header__brand" (click)="navigation.scrollTo('home')">
+      {{ site.name }}
+    </button>
 
     <ul class="site-header__links" role="list">
       @for (item of navigation.items; track item.id) {
         <li>
-          <a
-            routerLink="/home"
-            [fragment]="item.id"
+          <button
+            type="button"
             class="site-header__link"
             [class.is-active]="isActive(item.id)"
             [attr.aria-current]="isActive(item.id) ? 'location' : null"
+            (click)="navigation.scrollTo(item.id)"
           >
             {{ item.label }}
-          </a>
+          </button>
         </li>
       }
     </ul>
@@ -74,17 +76,16 @@
       <ul class="site-drawer__list" role="list" [class.is-open]="drawerShown()">
         @for (item of navigation.items; track item.id) {
           <li class="site-drawer__item" [style.--i]="$index">
-            <a
-              routerLink="/home"
-              [fragment]="item.id"
+            <button
+              type="button"
               class="site-drawer__link"
               [class.is-active]="isActive(item.id)"
               [attr.aria-current]="isActive(item.id) ? 'location' : null"
-              (click)="closeMenu()"
+              (click)="navigation.scrollTo(item.id); closeMenu()"
             >
               {{ item.label }}
               <i class="pi pi-arrow-right site-drawer__link-icon" aria-hidden="true"></i>
-            </a>
+            </button>
           </li>
         }
       </ul>

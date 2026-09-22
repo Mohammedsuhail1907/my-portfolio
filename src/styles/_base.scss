@@ -114,8 +114,16 @@ select {
   color: inherit;
 }
 
+// A plain `<button>` used for an in-page action (e.g. section navigation) should look like
+// nothing until its own class styles it — PrimeNG's own buttons are unaffected: `.p-button` is a
+// class selector, so it always outranks this bare-element one regardless of source order.
 button {
   cursor: pointer;
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: inherit;
 }
 
 ul[role='list'],
