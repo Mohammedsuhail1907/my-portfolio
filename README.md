@@ -28,12 +28,16 @@ src/
   index.html                 SEO meta, JSON-LD, font/image preloads, pre-paint theme script
   styles.scss                Global entry — imports the partials below in order
   styles/
-    _tokens.scss             Design tokens (colours, type, spacing, radius, shadows, motion)
-    _mixins.scss             Breakpoints, hover/motion guards, card/lift/eyebrow helpers
-    _base.scss               Reset, typography, focus styles, skip link
+    _tokens.scss             Design tokens (colours, glass surfaces, gradients, type, spacing,
+                             radius, shadows/glows, motion) — separate light and dark sets
+    _mixins.scss             Breakpoints, hover/motion guards, glass-surface, hover-lift,
+                             gradient-border-hover, eyebrow, icon-tile
+    _base.scss               Reset, typography, focus styles, skip link, .icon-tile, .gradient-text
     _layout.scss             .container, .section, .grid-2, .grid-auto, .stack, .cluster
-    _motion.scss             Reveal, entrance, hover, route + theme transitions, reduced motion
-    _primeng.scss            Small PrimeNG adjustments
+    _motion.scss             Reveal, entrance, float, pulse-ring, hover, theme reveal/cross-fade,
+                             reduced motion
+    _primeng.scss            PrimeNG in the design language: glass cards/chips/dialog/toast,
+                             button feedback, form fields, scroll-to-top
   app/
     app.routes.ts            One route (the root) that lazy-loads the page; '**' redirects to it
     app.config.ts            Router, HttpClient, PrimeNG theme, Toast
@@ -43,9 +47,11 @@ src/
     data/                    Editable content that isn't Skills/Projects: about, experience, tech icons
     services/                PortfolioDataService (skills/projects), ThemeService (light/dark),
                              NavigationService (in-page scroll — never touches the URL)
-    directives/              RevealDirective (IntersectionObserver reveal-on-scroll)
-    shared/                  SectionHeading, TechIcon, ThemeToggle (floating light/dark switch),
-                             AmbientBackground (animated backdrop behind every page)
+    directives/              RevealDirective (IntersectionObserver reveal-on-scroll),
+                             CountUpDirective (stat tiles count up when they scroll into view)
+    shared/                  SectionHeading (self-revealing), TechIcon, EmptyState, ThemeToggle
+                             (floating light/dark switch), AmbientBackground (animated backdrop),
+                             load-state.ts (loading / ready / error wrapper for async content)
     pages/                   hero, about, experience, skills, projects, contact, footer, home
   assets/
     data/portfolio.json      Skills and Projects content (see PortfolioDataService)
@@ -72,6 +78,21 @@ Everything visible on the site is data, not markup:
     with real work, then set `SITE.features.projects = true`.
 - **Experience** — `src/app/data/experience.data.ts`. The timeline section and its navigation link
   appear automatically once the array has entries.
+
+## Design language
+
+Every section is built from the same shared pieces, so new UI should reuse them rather than
+restyle locally:
+
+- **Glass surfaces** — `p-card`, chips, form fields, dialog and toast are translucent, blurred
+  over the ambient backdrop (`glass-surface` mixin / `--surface-card`). Cards marked `hover-lift`
+  lift, glow and light up a gradient hairline over their border.
+- **Gradient accents** — `--gradient-brand` drives eyebrow rules, `.gradient-text`, icon-tile
+  hover fills, section hairlines and the contact form's top edge.
+- **Motion** — sections reveal on scroll (`appReveal`, staggered with `revealStagger`), the hero
+  enters once (`.enter`), decorative pieces drift (`.float`), the scroll cue and current-role marker
+  pulse, and async content shows skeletons (`p-skeleton`) or an `<app-empty-state>`. Everything is
+  disabled or instant under `prefers-reduced-motion`.
 
 ## Theme
 

@@ -29,12 +29,9 @@
   gap: var(--space-4);
 }
 
-.method__icon {
-  @include icon-tile;
-
-  > i {
-    font-size: var(--fs-lead);
-  }
+// Tile chrome comes from the global .icon-tile.
+.method__icon > i {
+  font-size: var(--fs-lead);
 }
 
 .method__body {
@@ -74,6 +71,19 @@ a.method__value:hover {
 .contact-form-card {
   --p-card-body-padding: var(--space-6);
 
+  overflow: hidden;
+
+  // Gradient accent along the top edge.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    inset-inline: 0;
+    height: 3px;
+    background: var(--gradient-brand);
+    pointer-events: none;
+  }
+
   @include up(md) {
     --p-card-body-padding: var(--space-8);
   }
@@ -92,6 +102,12 @@ a.method__value:hover {
     font-size: var(--fs-sm);
     font-weight: 500;
     color: var(--text-strong);
+    transition: color var(--dur-fast) var(--ease-standard);
+  }
+
+  // Label follows the field's focus.
+  &:focus-within label {
+    color: var(--brand);
   }
 }
 

@@ -21,8 +21,15 @@
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
 }
 
-.projects-grid__item {
+.projects-grid__item,
+.projects-grid__placeholder {
   display: flex;
+}
+
+// Cards re-enter (staggered) whenever the filter re-renders them, not only on the first reveal.
+.projects-grid.is-visible .projects-grid__item {
+  animation: enter-up var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger-step));
 }
 
 .project-card {
@@ -31,6 +38,7 @@
 }
 
 .project-card__media {
+  display: block;
   aspect-ratio: 5 / 3;
   overflow: hidden;
   background: var(--surface-inset);
@@ -63,12 +71,6 @@
 
 .project-card__actions {
   --cluster-gap: var(--space-1);
-}
-
-.projects-empty {
-  grid-column: 1 / -1;
-  padding-block: var(--space-8);
-  text-align: center;
 }
 
 // Detail dialog ---------------------------------------------------------------------------------

@@ -4,6 +4,10 @@
 // app/config/app.preset.ts (blue / slate) so PrimeNG components and hand-written
 // sections share one palette in both colour schemes. Literal values (not --p-*
 // variables) are used so the page paints correctly before Angular boots.
+//
+// Surfaces are glass: translucent fills blurred over the ambient backdrop
+// (shared/ambient-background), with an inner top highlight and hairline border.
+// Each scheme has its own tuned set — dark is not an inversion of light.
 // ============================================================================
 
 :root {
@@ -15,6 +19,8 @@
   --brand-ring: rgba(37, 99, 235, 0.35);
   --accent: #7c3aed;                // violet-600 — use sparingly
   --accent-soft: #f5f3ff;
+  --gradient-brand: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%);
+  --gradient-soft: linear-gradient(135deg, var(--brand-soft) 0%, var(--accent-soft) 100%);
 
   // Status ------------------------------------------------------------------
   --success: #059669;
@@ -23,12 +29,14 @@
 
   // Surfaces ----------------------------------------------------------------
   --surface-page: #ffffff;
-  --surface-alt: rgba(248, 250, 252, 0.6);    // slate-50, translucent: alternating sections let the ambient backdrop through
-  --surface-card: #ffffff;
-  --surface-card-hover: #ffffff;
-  --surface-inset: #f1f5f9;         // slate-100 — chips, inputs on cards
-  --surface-glass: rgba(255, 255, 255, 0.72); // floating controls over a blurred backdrop
+  --surface-alt: rgba(248, 250, 252, 0.6);    // slate-50, translucent: alternating sections let the backdrop through
+  --surface-card: rgba(255, 255, 255, 0.72);  // glass cards
+  --surface-inset: #f1f5f9;         // slate-100 — chips, hover rows on cards
+  --surface-input: rgba(255, 255, 255, 0.6);  // form fields on a glass card
+  --surface-glass: rgba(255, 255, 255, 0.72); // floating controls
   --surface-footer: #0f172a;        // slate-900
+  --glass-highlight: rgba(255, 255, 255, 0.65); // inner top edge of glass surfaces
+  --glass-blur: 14px;
   --border-color: #e2e8f0;          // slate-200
   --border-hover: #bfdbfe;          // blue-200
   --border-strong: #cbd5e1;         // slate-300
@@ -96,12 +104,15 @@
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
   --shadow-md: 0 6px 16px -6px rgba(15, 23, 42, 0.12), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
   --shadow-lg: 0 18px 36px -14px rgba(15, 23, 42, 0.2);
+  --glow-brand: 0 10px 30px -10px rgba(37, 99, 235, 0.55);   // primary buttons, active icon tiles
+  --glow-soft: 0 16px 40px -20px rgba(37, 99, 235, 0.35);    // lifted cards
 
   // Motion ------------------------------------------------------------------
   --dur-fast: 150ms;
   --dur-base: 250ms;
   --dur-slow: 450ms;
   --dur-theme: 600ms;               // theme reveal (see _motion.scss)
+  --dur-float: 7s;                  // ambient float of decorative elements
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --stagger-step: 60ms;
@@ -129,11 +140,12 @@
 
   --surface-page: #020617;          // slate-950
   --surface-alt: rgba(15, 23, 42, 0.45);      // slate-900, translucent
-  --surface-card: #0f172a;          // slate-900 (= PrimeNG dark content background)
-  --surface-card-hover: #13203a;
+  --surface-card: rgba(15, 23, 42, 0.62);     // slate-900 glass
   --surface-inset: #1e293b;         // slate-800
+  --surface-input: rgba(2, 6, 23, 0.55);
   --surface-glass: rgba(15, 23, 42, 0.72);
   --surface-footer: #020617;
+  --glass-highlight: rgba(255, 255, 255, 0.06);
   --border-color: #1e293b;          // slate-800
   --border-hover: rgba(96, 165, 250, 0.45);
   --border-strong: #334155;
@@ -155,6 +167,8 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 6px 16px -6px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 18px 36px -14px rgba(0, 0, 0, 0.6);
+  --glow-brand: 0 10px 30px -10px rgba(96, 165, 250, 0.45);
+  --glow-soft: 0 16px 40px -20px rgba(96, 165, 250, 0.3);
 
   color-scheme: dark;
 }

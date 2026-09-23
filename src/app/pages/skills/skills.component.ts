@@ -1,11 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CardModule } from 'primeng/card';
+import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
-import { SkillCategory, SkillTier, skillTier } from '../../models/portfolio-data.model';
+import { SkillTier, skillTier } from '../../models/portfolio-data.model';
 import { TECH_ICONS } from '../../data/tech-icons';
 import { RevealDirective } from '../../directives/reveal.directive';
 import { PortfolioDataService } from '../../services/portfolio-data.service';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import { toLoadState } from '../../shared/load-state';
 import { SectionHeadingComponent } from '../../shared/section-heading/section-heading.component';
 import { TechIconComponent } from '../../shared/tech-icon/tech-icon.component';
 
@@ -20,6 +23,9 @@ const TIER_SEVERITY: Record<SkillTier, TierSeverity> = {
 
 /** Tiers in descending order, as shown in the legend. */
 const TIERS: SkillTier[] = ['Expert', 'Advanced', 'Intermediate'];
+
+/** Rows per placeholder card while loading — roughly the real categories' sizes. */
+const SKELETON_ROWS = [5, 2, 1, 3];
 
 export function tierSeverity(tier: SkillTier): TierSeverity {
   return TIER_SEVERITY[tier];
@@ -63,14 +69,23 @@ interface TierLegendItem {
 
 /**
  * Skills section: one card per category with each skill shown as a proficiency tier
- * (never a percentage or bar), followed by a legend that explains the three tiers.
+ * (never a percentage or bar), followed by a legend that explains the three tiers. Skeleton cards
+ * hold the layout while the data loads; a failed load shows an empty state.
  *
  * Content comes from `PortfolioDataService` (currently backed by `assets/data/portfolio.json`),
  * so it can be swapped for a real API later without touching this component.
  */
 @Component({
   selector: 'app-skills',
-  imports: [CardModule, TagModule, SectionHeadingComponent, TechIconComponent, RevealDirective],
+  imports: [
+    CardModule,
+    SkeletonModule,
+    TagModule,
+    SectionHeadingComponent,
+    EmptyStateComponent,
+    TechIconComponent,
+    RevealDirective,
+  ],
   templateUrl: './skills.component.html',
   styleUrl: './skills.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -78,12 +93,18 @@ interface TierLegendItem {
 export class SkillsComponent {
   private readonly portfolioData = inject(PortfolioDataService);
 
-  private readonly skillCategories = toSignal(this.portfolioData.getSkillCategories(), {
-    initialValue: [] as SkillCategory[],
+  private readonly state = toSignal(toLoadState(this.portfolioData.getSkillCategories()), {
+    requireSync: true,
   });
 
-  protected readonly categories = computed<SkillCategoryView[]>(() =>
-    this.skillCategories().map((category) => ({
+  protected readonly status = computed(() => this.state().status);
+
+  protected readonly categories = computed<SkillCategoryView[]>(() => {
+    const state = this.state();
+    if (state.status !== 'ready') {
+      return [];
+    }
+    return state.value.map((category) => ({
       id: category.id,
       title: category.title,
       icon: category.icon,
@@ -98,11 +119,16 @@ export class SkillsComponent {
           darkBrand: hasDarkBrand(skill.icon),
         };
       }),
-    })),
-  );
+    }));
+  });
 
   protected readonly tiers: TierLegendItem[] = TIERS.map((tier) => ({
     tier,
     severity: tierSeverity(tier),
   }));
+
+  /** One inner array per placeholder card, sized by SKELETON_ROWS. */
+  protected readonly skeletonCards = SKELETON_ROWS.map((rows) =>
+    Array.from({ length: rows }, (_, index) => index),
+  );
 }

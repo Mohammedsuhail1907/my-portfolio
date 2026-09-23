@@ -5,14 +5,45 @@
 }
 
 .site-footer {
-  // The footer is dark in both colour schemes, so these two local values are literal on purpose.
+  // The footer is dark in both colour schemes, so these local values are literal on purpose.
   --footer-fg-strong: #f8fafc;
   --footer-border: rgba(148, 163, 184, 0.18);
+  --footer-glass: rgba(255, 255, 255, 0.04);
 
+  position: relative;
+  overflow: hidden;
   padding-block: var(--space-16) var(--space-8);
   background: var(--surface-footer);
   color: var(--text-on-footer);
-  border-top: 1px solid var(--footer-border);
+
+  // Gradient hairline along the top edge, fading out towards the sides.
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--brand) 30%, var(--accent) 70%, transparent);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  // Soft brand glow in the lower-left corner.
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -14rem;
+    left: -10rem;
+    width: 34rem;
+    height: 34rem;
+    border-radius: var(--radius-full);
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.22) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  > .container {
+    position: relative;
+  }
 }
 
 // Top grid: intro + link columns ----------------------------------------------------------------
@@ -73,11 +104,14 @@
 }
 
 .site-footer__link {
-  transition: color var(--dur-fast) var(--ease-standard);
+  transition:
+    color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-out);
 
   &:hover,
   &:focus-visible {
     color: var(--footer-fg-strong);
+    transform: translateX(3px);
   }
 }
 
@@ -104,6 +138,7 @@
   color: var(--text-on-footer-muted);
 }
 
+// Glass pill.
 .site-footer__top {
   display: inline-flex;
   align-items: center;
@@ -112,12 +147,17 @@
   padding-inline: var(--space-4);
   border: 1px solid var(--footer-border);
   border-radius: var(--radius-full);
+  background: var(--footer-glass);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   font-size: var(--fs-sm);
   font-weight: 500;
   color: var(--text-on-footer);
   transition:
     color var(--dur-fast) var(--ease-standard),
-    border-color var(--dur-fast) var(--ease-standard);
+    border-color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-out);
 
   .pi {
     font-size: var(--fs-xs);
@@ -128,9 +168,15 @@
   &:focus-visible {
     color: var(--footer-fg-strong);
     border-color: var(--text-on-footer-muted);
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
 
     .pi {
       transform: translateY(-2px);
     }
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.97);
   }
 }

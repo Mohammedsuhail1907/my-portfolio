@@ -15,7 +15,11 @@
           styleClass="experience-timeline"
         >
           <ng-template #marker let-item>
-            <span class="experience__marker reveal-item" [style.--i]="item.index">
+            <span
+              class="icon-tile experience__marker reveal-item"
+              [class.experience__marker--current]="!item.end"
+              [style.--i]="item.index"
+            >
               <i class="pi pi-briefcase" aria-hidden="true"></i>
             </span>
           </ng-template>

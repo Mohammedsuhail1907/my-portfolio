@@ -32,8 +32,21 @@
   background: var(--surface-alt);
 }
 
-.section--bordered {
-  border-top: 1px solid var(--border-color);
+// Hairline between sections that fades out towards the edges.
+.section--bordered::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-strong) 20%,
+    var(--border-strong) 80%,
+    transparent
+  );
+  pointer-events: none;
 }
 
 .section__body {

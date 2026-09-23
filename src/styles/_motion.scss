@@ -99,6 +99,36 @@
   animation-name: enter-scale;
 }
 
+// Ambient float for decorative elements (portrait, orbs, empty-state icons) ------------
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.float {
+  animation: float var(--dur-float) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+// Expanding ring used on the scroll cue and the "current role" timeline marker.
+@keyframes pulse-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
 // Interaction utilities -----------------------------------------------------------
 .hover-lift {
   @include hover-lift;
@@ -113,7 +143,7 @@
     inset-inline: 0;
     bottom: -2px;
     height: 2px;
-    background: currentColor;
+    background: var(--gradient-brand);
     border-radius: 1px;
     transform: scaleX(0);
     transform-origin: left;
@@ -205,6 +235,10 @@ html.theme-transition *::after {
   .enter {
     opacity: 1;
     transform: none;
+    animation: none;
+  }
+
+  .float {
     animation: none;
   }
 

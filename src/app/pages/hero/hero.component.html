@@ -4,23 +4,38 @@
       <div class="hero__content">
         <p class="eyebrow hero__greeting enter" [style.--i]="0">{{ site.greeting }}</p>
         <h1 id="hero-title" class="hero__name enter" [style.--i]="1">{{ site.name }}</h1>
-        <p class="hero__role enter" [style.--i]="2">{{ site.role }}</p>
+        <p class="hero__role gradient-text enter" [style.--i]="2">{{ site.role }}</p>
         <p class="lead text-muted hero__tagline enter" [style.--i]="3">{{ site.tagline }}</p>
 
-        <ul role="list" class="cluster hero__tech enter" aria-label="Core technologies" [style.--i]="4">
-          @for (skill of highlights(); track skill.name) {
-            <li>
-              <p-chip>
-                <span class="chip-body">
-                  <app-tech-icon
-                    [name]="skill.icon"
-                    [fallback]="skill.fallbackIcon ?? 'pi pi-code'"
-                    [size]="16"
-                  />
-                  <span>{{ skill.name }}</span>
-                </span>
-              </p-chip>
-            </li>
+        @let chips = highlights();
+        <ul
+          role="list"
+          class="cluster hero__tech enter"
+          aria-label="Core technologies"
+          [style.--i]="4"
+          [attr.aria-busy]="chips.status === 'loading' ? 'true' : null"
+        >
+          @if (chips.status === 'ready') {
+            @for (skill of chips.value; track skill.name) {
+              <li>
+                <p-chip>
+                  <span class="chip-body">
+                    <app-tech-icon
+                      [name]="skill.icon"
+                      [fallback]="skill.fallbackIcon ?? 'pi pi-code'"
+                      [size]="16"
+                    />
+                    <span>{{ skill.name }}</span>
+                  </span>
+                </p-chip>
+              </li>
+            }
+          } @else if (chips.status === 'loading') {
+            @for (width of chipPlaceholders; track $index) {
+              <li>
+                <p-skeleton [width]="width + 'rem'" height="2rem" borderRadius="999px" />
+              </li>
+            }
           }
         </ul>
 
@@ -72,8 +87,11 @@
       </div>
 
       <div class="hero__visual">
+        <span class="hero__orb hero__orb--1 float" aria-hidden="true"></span>
+        <span class="hero__orb hero__orb--2 float" aria-hidden="true"></span>
         <figure class="hero__portrait enter enter--scale" [style.--i]="2">
           <img
+            class="float"
             [src]="site.portrait.src"
             [alt]="site.portrait.alt"
             width="800"

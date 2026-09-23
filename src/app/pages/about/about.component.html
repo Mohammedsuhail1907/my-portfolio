@@ -12,8 +12,8 @@
         <ul class="about__stats" role="list" appReveal revealStagger>
           @for (stat of stats; track stat.label) {
             <li class="reveal-item" [style.--i]="$index">
-              <p-card styleClass="about__stat">
-                <span class="about__stat-value">{{ stat.value }}</span>
+              <p-card class="about__stat">
+                <span class="about__stat-value gradient-text" [appCountUp]="stat.value"></span>
                 <span class="about__stat-label">{{ stat.label }}</span>
               </p-card>
             </li>
@@ -27,9 +27,9 @@
         <ul class="stack" role="list" appReveal revealStagger>
           @for (service of services; track service.title) {
             <li class="reveal-item" [style.--i]="$index">
-              <p-card styleClass="about__service hover-lift">
+              <p-card class="about__service hover-lift">
                 <div class="about__service-body">
-                  <span class="about__service-icon">
+                  <span class="icon-tile about__service-icon">
                     <i [class]="service.icon" aria-hidden="true"></i>
                   </span>
                   <div class="about__service-text">

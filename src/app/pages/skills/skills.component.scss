@@ -31,8 +31,9 @@
   margin-bottom: var(--space-4);
 }
 
+// Tile chrome comes from the global .icon-tile.
 .skill-card__icon {
-  @include icon-tile(2.5rem);
+  --tile-size: 2.5rem;
 
   > i {
     font-size: var(--fs-lead);
@@ -53,11 +54,26 @@
   align-items: center;
   gap: var(--space-3);
   min-height: 2.75rem;
-  padding-block: var(--space-2);
+  // Bleeds the hover highlight slightly past the text so it reads as a row, not a stripe.
+  margin-inline: calc(-1 * var(--space-2));
+  padding: var(--space-2);
   border-top: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--dur-fast) var(--ease-standard);
 
   &:first-child {
     border-top: 0;
+  }
+}
+
+@include can-hover {
+  .skill:hover {
+    background: var(--surface-inset);
+  }
+
+  .skill:hover .skill__name {
+    color: var(--brand);
+    transform: translateX(2px);
   }
 }
 
@@ -70,6 +86,9 @@
   min-width: 0;
   font-weight: 500;
   color: var(--text-strong);
+  transition:
+    color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-out);
 }
 
 .skill__tier {

@@ -1,8 +1,9 @@
 @use 'mixins' as *;
 
 // Hero: full-viewport introduction. Structure comes from the global .section / .container /
-// .grid-2 / .cluster primitives; this file adds the hero's rhythm, the portrait frame and the
-// scroll cue. The section is transparent so the ambient backdrop shows through.
+// .grid-2 / .cluster primitives; this file adds the hero's rhythm, the floating portrait with its
+// halo and orbs, and the scroll cue. The section is transparent so the ambient backdrop shows
+// through.
 
 :host {
   display: block;
@@ -13,6 +14,8 @@
   align-items: center;
   min-height: 100vh;
   min-height: 100dvh;
+  // The portrait halo and orbs may extend past the container near the lg breakpoint.
+  overflow: clip;
 }
 
 .hero__grid {
@@ -35,12 +38,12 @@
   color: var(--text-strong);
 }
 
+// Colour comes from the global .gradient-text.
 .hero__role {
   margin-top: var(--space-3);
   font-size: var(--fs-h3);
   font-weight: 600;
   line-height: var(--lh-snug);
-  color: var(--brand);
 }
 
 .hero__tagline {
@@ -51,6 +54,7 @@
 .hero__tech {
   --cluster-gap: var(--space-2);
 
+  min-height: 2rem; // matches the chip / skeleton height, so loading never shifts the layout
   margin-top: var(--space-6);
 }
 
@@ -61,11 +65,6 @@
   font-size: var(--fs-sm);
   line-height: var(--lh-snug);
   color: var(--text-body);
-}
-
-:host ::ng-deep .hero__tech .p-chip {
-  background: var(--surface-inset);
-  border: 1px solid var(--border-color);
 }
 
 .hero__actions {
@@ -104,8 +103,38 @@
 
 // Portrait column -----------------------------------------------------------------------------
 .hero__visual {
+  position: relative;
   display: flex;
   justify-content: center;
+}
+
+// Decorative orbs drifting beside the portrait (rendered before it, so they sit behind).
+.hero__orb {
+  position: absolute;
+  border-radius: var(--radius-full);
+  background: var(--gradient-brand);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.hero__orb--1 {
+  --float-delay: -2s;
+  --dur-float: 6s;
+
+  top: 4%;
+  right: 8%;
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.hero__orb--2 {
+  --float-delay: -4s;
+  --dur-float: 8s;
+
+  bottom: 2%;
+  left: 6%;
+  width: 2.25rem;
+  height: 2.25rem;
 }
 
 .hero__portrait {
@@ -114,7 +143,7 @@
   width: min(100%, 16rem);
   aspect-ratio: 4 / 5;
 
-  // Offset backing shape behind the photo.
+  // Offset backing shape behind the photo; the photo floats over it.
   &::before {
     content: '';
     position: absolute;
@@ -122,11 +151,25 @@
     z-index: -1;
     border: 1px solid var(--brand-soft-strong);
     border-radius: var(--radius-lg);
-    background: var(--brand-soft);
+    background: var(--gradient-soft);
     transform: translate(var(--space-3), var(--space-3)) rotate(-3deg);
   }
 
+  // Soft brand halo behind everything.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -18%;
+    z-index: -2;
+    border-radius: var(--radius-full);
+    background: radial-gradient(circle, var(--brand-ring) 0%, transparent 65%);
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
   img {
+    --dur-float: 8s;
+
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -158,9 +201,8 @@
   width: 2.75rem;
   height: 2.75rem;
   margin-inline: auto;
-  border: 1px solid var(--border-color);
+  @include glass-surface(8px);
   border-radius: var(--radius-full);
-  background: var(--surface-card);
   color: var(--text-muted);
   transition:
     color var(--dur-fast) var(--ease-standard),
@@ -175,13 +217,24 @@
     &:hover {
       color: var(--brand);
       border-color: var(--border-hover);
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow-md);
     }
   }
 
   @include motion-safe {
     .pi {
       animation: hero-scroll-cue 2s var(--ease-standard) infinite;
+    }
+
+    // Expanding ring (global keyframes).
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--brand);
+      border-radius: inherit;
+      animation: pulse-ring 2.4s var(--ease-out) infinite;
+      pointer-events: none;
     }
   }
 

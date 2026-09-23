@@ -3,90 +3,125 @@
     <app-section-heading eyebrow="Projects" title="My Projects" titleId="projects-title" />
 
     <div class="section__body">
-      <div class="projects-filter" appReveal="fade">
-        <p-selectbutton
-          class="projects-filter__control"
-          [options]="categories()"
-          [ngModel]="activeFilter()"
-          (ngModelChange)="setFilter($event)"
-          [allowEmpty]="false"
-          aria-label="Filter projects by category"
-        />
-        <p class="visually-hidden" role="status" aria-live="polite">
-          Showing {{ filtered().length }} of {{ projects().length }} projects
-        </p>
-      </div>
-
-      <div class="grid-auto projects-grid" appReveal revealStagger>
-        @for (project of filtered(); track project.id) {
-          <article class="reveal-item projects-grid__item" [style.--i]="$index">
-            <p-card class="project-card hover-lift">
-              <ng-template #header>
-                <div class="project-card__media">
-                  <img
-                    [src]="project.image"
-                    [alt]="project.title"
-                    loading="lazy"
-                    decoding="async"
-                    width="500"
-                    height="300"
-                  />
-                </div>
-              </ng-template>
-
-              <ng-template #title>
-                <h3 class="project-card__title">{{ project.title }}</h3>
-              </ng-template>
-
-              <div class="project-card__body stack">
-                <p class="text-muted">{{ project.description }}</p>
-                <ul class="cluster project-card__tech" role="list" aria-label="Technologies">
-                  @for (tech of project.technologies; track tech) {
-                    <li>
-                      <p-tag [value]="tech" severity="secondary" [rounded]="true" />
-                    </li>
-                  }
-                </ul>
+      @switch (status()) {
+        @case ('loading') {
+          <div class="grid-auto projects-grid" aria-busy="true" aria-label="Loading projects">
+            @for (card of skeletonCards; track card) {
+              <div class="projects-grid__placeholder">
+                <p-card class="project-card">
+                  <ng-template #header>
+                    <p-skeleton class="project-card__media" width="100%" height="auto" borderRadius="0" />
+                  </ng-template>
+                  <div class="project-card__body stack">
+                    <p-skeleton width="60%" height="1.25rem" />
+                    <p-skeleton width="100%" height="0.9rem" />
+                    <p-skeleton width="85%" height="0.9rem" />
+                    <div class="cluster project-card__tech">
+                      <p-skeleton width="4rem" height="1.5rem" borderRadius="999px" />
+                      <p-skeleton width="5rem" height="1.5rem" borderRadius="999px" />
+                    </div>
+                  </div>
+                </p-card>
               </div>
-
-              <ng-template #footer>
-                <div class="cluster project-card__actions">
-                  <p-button
-                    label="Details"
-                    icon="pi pi-eye"
-                    [text]="true"
-                    (onClick)="open(project, $event)"
-                  />
-                  @if (project.demoUrl) {
-                    <a
-                      pButton
-                      [text]="true"
-                      icon="pi pi-external-link"
-                      label="Live Demo"
-                      [href]="project.demoUrl"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    ></a>
-                  }
-                  @if (project.githubUrl) {
-                    <a
-                      pButton
-                      [text]="true"
-                      icon="pi pi-github"
-                      label="Code"
-                      [href]="project.githubUrl"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    ></a>
-                  }
-                </div>
-              </ng-template>
-            </p-card>
-          </article>
-        } @empty {
-          <p class="projects-empty text-muted">No projects in this category yet.</p>
+            }
+          </div>
         }
-      </div>
+
+        @case ('error') {
+          <app-empty-state
+            icon="pi pi-exclamation-circle"
+            message="Projects couldn't be loaded."
+            hint="Please refresh the page to try again."
+          />
+        }
+
+        @default {
+          <div class="projects-filter" appReveal="fade">
+            <p-selectbutton
+              class="projects-filter__control"
+              [options]="categories()"
+              [ngModel]="activeFilter()"
+              (ngModelChange)="setFilter($event)"
+              [allowEmpty]="false"
+              aria-label="Filter projects by category"
+            />
+            <p class="visually-hidden" role="status" aria-live="polite">
+              Showing {{ filtered().length }} of {{ projects().length }} projects
+            </p>
+          </div>
+
+          <div class="grid-auto projects-grid" appReveal revealStagger>
+            @for (project of filtered(); track project.id) {
+              <article class="reveal-item projects-grid__item" [style.--i]="$index">
+                <p-card class="project-card hover-lift">
+                  <ng-template #header>
+                    <div class="project-card__media">
+                      <img
+                        [src]="project.image"
+                        [alt]="project.title"
+                        loading="lazy"
+                        decoding="async"
+                        width="500"
+                        height="300"
+                      />
+                    </div>
+                  </ng-template>
+
+                  <ng-template #title>
+                    <h3 class="project-card__title">{{ project.title }}</h3>
+                  </ng-template>
+
+                  <div class="project-card__body stack">
+                    <p class="text-muted">{{ project.description }}</p>
+                    <ul class="cluster project-card__tech" role="list" aria-label="Technologies">
+                      @for (tech of project.technologies; track tech) {
+                        <li>
+                          <p-tag [value]="tech" severity="secondary" [rounded]="true" />
+                        </li>
+                      }
+                    </ul>
+                  </div>
+
+                  <ng-template #footer>
+                    <div class="cluster project-card__actions">
+                      <p-button
+                        label="Details"
+                        icon="pi pi-eye"
+                        [text]="true"
+                        (onClick)="open(project, $event)"
+                      />
+                      @if (project.demoUrl) {
+                        <a
+                          pButton
+                          [text]="true"
+                          icon="pi pi-external-link"
+                          label="Live Demo"
+                          [href]="project.demoUrl"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        ></a>
+                      }
+                      @if (project.githubUrl) {
+                        <a
+                          pButton
+                          [text]="true"
+                          icon="pi pi-github"
+                          label="Code"
+                          [href]="project.githubUrl"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        ></a>
+                      }
+                    </div>
+                  </ng-template>
+                </p-card>
+              </article>
+            } @empty {
+              <app-empty-state icon="pi pi-folder-open" message="No projects in this category yet." />
+            }
+          </div>
+        }
+      }
     </div>
   </div>
 
