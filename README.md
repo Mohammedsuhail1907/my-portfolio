@@ -47,7 +47,8 @@ src/
     data/                    Editable content that isn't Skills/Projects: about, experience, tech icons
     services/                PortfolioDataService (skills/projects), ThemeService (light/dark),
                              NavigationService (in-page scroll — never touches the URL)
-    directives/              RevealDirective (IntersectionObserver reveal-on-scroll),
+    directives/              HomeZoomDirective (scroll-driven, pointer-anchored zoom out of Home),
+                             RevealDirective (IntersectionObserver reveal-on-scroll),
                              CountUpDirective (stat tiles count up when they scroll into view)
     shared/                  SectionHeading (self-revealing), TechIcon, EmptyState, ThemeToggle
                              (floating light/dark switch), AmbientBackground (animated backdrop),
@@ -89,10 +90,22 @@ restyle locally:
   lift, glow and light up a gradient hairline over their border.
 - **Gradient accents** — `--gradient-brand` drives eyebrow rules, `.gradient-text`, icon-tile
   hover fills, section hairlines and the contact form's top edge.
-- **Motion** — sections reveal on scroll (`appReveal`, staggered with `revealStagger`), the hero
-  enters once (`.enter`), decorative pieces drift (`.float`), the scroll cue and current-role marker
-  pulse, and async content shows skeletons (`p-skeleton`) or an `<app-empty-state>`. Everything is
-  disabled or instant under `prefers-reduced-motion`.
+- **Motion** — leaving the Home page is a scroll-driven zoom (`appHomeZoom` on the hero
+  section): scroll position maps to a 0–1 progress over `--home-zoom-distance` of the hero's
+  height, the hero zooms towards the mouse pointer up to `--home-zoom-max` (accelerating) and
+  fades out over the last part while the next section slides in beneath it; scrolling back
+  scrubs it in reverse. Touch devices zoom from the viewport centre. Leaving Home via a link is
+  cinematic too: `NavigationService` holds the destination zoomed out and hidden while the page
+  scrolls, then zooms it into the viewport once the scroll settles (`page-enter-pending` /
+  `page-enter`). Every other section scrolls normally. Inside a section,
+  elements reveal on scroll (`appReveal`, staggered with `revealStagger`) in hierarchy order via
+  `revealDelay` — heading first, body groups next, their items after (the delay is the inherited
+  `--reveal-delay`). The page lands with a fade while the hero enters once (`.enter`), decorative
+  pieces drift (`.float`), the scroll cue and current-role marker pulse, and async content shows
+  skeletons (`p-skeleton`) or an `<app-empty-state>`. Real route changes (there is only one route
+  today) animate only from or to the Home route — it recedes or zooms back in via the Router's
+  view transitions; other route changes skip the transition. Everything is disabled or instant
+  under `prefers-reduced-motion`.
 
 ## Theme
 

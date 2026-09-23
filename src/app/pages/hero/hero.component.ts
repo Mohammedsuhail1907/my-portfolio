@@ -5,6 +5,7 @@ import { ChipModule } from 'primeng/chip';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { SITE } from '../../config/site.config';
+import { HomeZoomDirective } from '../../directives/home-zoom.directive';
 import { NavigationService } from '../../services/navigation.service';
 import { PortfolioDataService } from '../../services/portfolio-data.service';
 import { toLoadState } from '../../shared/load-state';
@@ -22,11 +23,19 @@ interface HeroAction {
  * `PortfolioDataService` (skeleton chips hold the row's height while they load); everything else
  * comes from `SITE`. In-page navigation calls `NavigationService.scrollTo` directly (plain buttons
  * — this app has one page and one URL). The entrance uses the global `.enter` classes, which play
- * once on load.
+ * once on load. Leaving Home is a scroll-driven, pointer-anchored zoom (HomeZoomDirective on the
+ * section).
  */
 @Component({
   selector: 'app-hero',
-  imports: [ButtonModule, ChipModule, SkeletonModule, TooltipModule, TechIconComponent],
+  imports: [
+    ButtonModule,
+    ChipModule,
+    SkeletonModule,
+    TooltipModule,
+    TechIconComponent,
+    HomeZoomDirective,
+  ],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

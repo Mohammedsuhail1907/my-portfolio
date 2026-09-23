@@ -1,14 +1,26 @@
-// The animation language: reveal-on-scroll, entrance, hover lift, route and theme transitions.
-// Every duration/easing comes from the motion tokens in _tokens.scss.
+// The animation language: scenes, reveal-on-scroll, entrance, hover lift, route and theme
+// transitions. Every duration/easing comes from the motion tokens in _tokens.scss.
 @use 'mixins' as *;
 
+// Home page zoom (HomeZoomDirective) --------------------------------------------------------
+// Scrubbed by the scroll position, not timed: the directive writes transform-origin (the
+// pointer), scale and opacity inline as the visitor scrolls away from Home and back. Only the
+// inner .container scales, clipped by the section, so nothing spills over the next section.
+// The layer hint is on only while a zoom is in progress.
+.home-zoom.is-zooming > .container {
+  will-change: transform;
+}
+
 // Scroll reveal (driven by RevealDirective) ------------------------------------
+// `--reveal-delay` is set by the directive and inherited, so items of a delayed group — and
+// reveals nested inside a delayed one — start after their parent.
 .reveal {
   opacity: 0;
   transform: translateY(20px);
   transition:
     opacity var(--dur-slow) var(--ease-out),
     transform var(--dur-slow) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
   will-change: opacity, transform;
 
   &.reveal--fade {
@@ -42,7 +54,7 @@
   transition:
     opacity var(--dur-slow) var(--ease-out),
     transform var(--dur-slow) var(--ease-out);
-  transition-delay: calc(var(--i, 0) * var(--stagger-step));
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger-step));
 }
 
 .reveal-group.is-visible .reveal-item {
@@ -85,10 +97,12 @@
   }
 }
 
+// `--enter-base` (set by the hero) holds the stagger back until the page landing fade has begun.
+// `backwards` keeps an element hidden during its delay and, unlike `forwards`, hands control back
+// to normal styles afterwards (hover transforms, the scroll cue fading with the Home page).
 .enter {
-  opacity: 0;
-  animation: enter-up 0.7s var(--ease-out) forwards;
-  animation-delay: calc(var(--i, 0) * 90ms);
+  animation: enter-up 0.7s var(--ease-out) backwards;
+  animation-delay: calc(var(--enter-base, 0ms) + var(--i, 0) * 90ms);
 }
 
 .enter--fade {
@@ -156,27 +170,72 @@
   }
 }
 
-// Route transitions (View Transitions API; skipped for same-page fragment jumps) -----
-@keyframes vt-out {
-  to {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
+// Page navigation from Home (NavigationService) ---------------------------------------------
+// While the page scrolls to the destination it is held zoomed out and hidden; once the scroll
+// settles it zooms into the viewport. Navigation between any other two sections is untouched.
+.page-enter-pending > .container {
+  transform: scale(0.9);
+  opacity: 0;
 }
 
-@keyframes vt-in {
+.page-enter > .container {
+  animation: page-enter var(--dur-page-enter) var(--ease-out) both;
+}
+
+@keyframes page-enter {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
-::view-transition-old(root) {
-  animation: vt-out 180ms var(--ease-standard) both;
+// Route transitions (Router `withViewTransitions`) — Home page only, see app.config.ts ------
+// Leaving Home: the Home page recedes (1 → 0.85, fading) while the destination zooms in
+// (0.9 → 1). Returning: the previous page fades while Home zooms back in. Every other route
+// change skips the transition entirely.
+@keyframes route-recede {
+  to {
+    opacity: 0;
+    transform: scale(0.85);
+  }
 }
 
-::view-transition-new(root) {
-  animation: vt-in 280ms var(--ease-out) both;
+@keyframes route-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes route-approach {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+html.route-home-exit {
+  &::view-transition-old(root) {
+    animation: route-recede 320ms var(--ease-standard) both;
+  }
+
+  &::view-transition-new(root) {
+    animation: route-approach 420ms var(--ease-out) both;
+  }
+}
+
+html.route-home-enter {
+  &::view-transition-old(root) {
+    animation: route-fade 240ms var(--ease-standard) both;
+  }
+
+  &::view-transition-new(root) {
+    animation: route-approach 420ms var(--ease-out) both;
+  }
 }
 
 // Theme switch ----------------------------------------------------------------------
@@ -242,8 +301,16 @@ html.theme-transition *::after {
     animation: none;
   }
 
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
+  .page-enter-pending > .container,
+  .page-enter > .container {
+    transform: none;
+    opacity: 1;
     animation: none;
+  }
+
+  // Outranks the Home-scoped route rules above.
+  html::view-transition-old(root),
+  html::view-transition-new(root) {
+    animation: none !important;
   }
 }

@@ -1,5 +1,8 @@
-import { Routes } from '@angular/router';
+import { ActivatedRouteSnapshot, Routes } from '@angular/router';
 import { SITE } from './config/site.config';
+
+/** Path of the Home page — the site root. */
+export const HOME_PATH = '';
 
 /**
  * A single route.
@@ -12,9 +15,18 @@ import { SITE } from './config/site.config';
  */
 export const routes: Routes = [
   {
-    path: '',
+    path: HOME_PATH,
     title: `${SITE.name} — ${SITE.role}`,
     loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
   },
-  { path: '**', redirectTo: '' },
+  { path: '**', redirectTo: HOME_PATH },
 ];
+
+/** True when a navigation snapshot resolves to the Home page (scopes the route transitions). */
+export function isHomeRoute(snapshot: ActivatedRouteSnapshot): boolean {
+  let leaf = snapshot;
+  while (leaf.firstChild) {
+    leaf = leaf.firstChild;
+  }
+  return leaf.routeConfig?.path === HOME_PATH;
+}

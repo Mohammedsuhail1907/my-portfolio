@@ -113,6 +113,9 @@
   --dur-slow: 450ms;
   --dur-theme: 600ms;               // theme reveal (see _motion.scss)
   --dur-float: 7s;                  // ambient float of decorative elements
+  --dur-page-enter: 700ms;          // a destination section zooming in after a link from Home (NavigationService)
+  --home-zoom-max: 1.6;             // Home page scale at full scroll progress (HomeZoomDirective)…
+  --home-zoom-distance: 0.75;       // …reached after scrolling this fraction of the Home page's height
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --stagger-step: 60ms;

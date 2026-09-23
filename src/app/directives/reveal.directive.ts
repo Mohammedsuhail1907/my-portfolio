@@ -22,6 +22,10 @@ export type RevealVariant = '' | 'up' | 'fade' | 'scale' | 'left' | 'right';
  *   <ul appReveal revealStagger>          children with class `reveal-item` and `[style.--i]="$index"`
  *   <div appReveal [revealDelay]="120">   extra delay in ms
  *
+ * The delay is exposed as the inherited `--reveal-delay` custom property, so a staggered group's
+ * items (and any reveal nested inside a delayed one) start after it — that is how each section's
+ * hierarchy is choreographed: heading first (no delay), then body groups, then their items.
+ *
  * Respects `prefers-reduced-motion` (content shows immediately) and degrades gracefully when
  * IntersectionObserver is unavailable.
  */
@@ -35,7 +39,7 @@ export type RevealVariant = '' | 'up' | 'fade' | 'scale' | 'left' | 'right';
     '[class.reveal--left]': 'variant() === "left"',
     '[class.reveal--right]': 'variant() === "right"',
     '[class.is-visible]': 'visible()',
-    '[style.transition-delay.ms]': 'delay() || null',
+    '[style.--reveal-delay]': 'delay() ? delay() + "ms" : null',
   },
 })
 export class RevealDirective implements OnInit, OnDestroy {

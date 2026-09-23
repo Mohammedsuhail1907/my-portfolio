@@ -9,8 +9,10 @@ import { ProjectsComponent } from '../projects/projects.component';
 import { SkillsComponent } from '../skills/skills.component';
 
 /**
- * The single page of this app: composes every section in order. Optional sections render only
- * when they have content (Experience) or are enabled (Projects) — see app/config/site.config.ts.
+ * The single page of this app: composes every section in order. The Home page (hero) carries
+ * the scroll-driven zoom (see HeroComponent / HomeZoomDirective); every other section scrolls
+ * normally. Optional sections render only when they have content (Experience) or are enabled
+ * (Projects) — see app/config/site.config.ts.
  */
 @Component({
   selector: 'app-home',

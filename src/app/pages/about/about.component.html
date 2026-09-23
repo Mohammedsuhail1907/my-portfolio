@@ -3,7 +3,7 @@
     <app-section-heading eyebrow="About" title="About Me" titleId="about-title" />
 
     <div class="section__body grid-2">
-      <div class="about__intro" appReveal>
+      <div class="about__intro" appReveal="left" [revealDelay]="120">
         <p class="lead about__lead">{{ intro.lead }}</p>
         @for (paragraph of intro.paragraphs; track paragraph) {
           <p class="about__paragraph">{{ paragraph }}</p>
@@ -21,7 +21,7 @@
         </ul>
       </div>
 
-      <div class="about__services" appReveal>
+      <div class="about__services" appReveal="right" [revealDelay]="200">
         <h3 class="about__subtitle">What I Do</h3>
 
         <ul class="stack" role="list" appReveal revealStagger>

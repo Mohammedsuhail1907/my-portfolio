@@ -6,6 +6,9 @@
 // through.
 
 :host {
+  // Holds the `.enter` stagger until the page landing fade is under way, so the name leads.
+  --enter-base: 150ms;
+
   display: block;
 }
 

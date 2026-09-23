@@ -37,7 +37,7 @@
         }
 
         @default {
-          <ul class="grid-auto skills-grid" role="list" appReveal revealStagger>
+          <ul class="grid-auto skills-grid" role="list" appReveal revealStagger [revealDelay]="120">
             @for (category of categories(); track category.id) {
               <li class="skills-grid__item reveal-item" [style.--i]="$index">
                 <p-card class="skill-card hover-lift">
@@ -72,7 +72,7 @@
             }
           </ul>
 
-          <p class="skills-legend text-muted" appReveal="fade" [revealDelay]="240">
+          <p class="skills-legend text-muted" appReveal="fade" [revealDelay]="420">
             <span class="visually-hidden">Proficiency levels:</span>
             @for (item of tiers; track item.tier) {
               <p-tag [value]="item.tier" [severity]="item.severity" [rounded]="true" />

@@ -36,7 +36,7 @@
         }
 
         @default {
-          <div class="projects-filter" appReveal="fade">
+          <div class="projects-filter" appReveal="fade" [revealDelay]="120">
             <p-selectbutton
               class="projects-filter__control"
               [options]="categories()"
@@ -50,7 +50,7 @@
             </p>
           </div>
 
-          <div class="grid-auto projects-grid" appReveal revealStagger>
+          <div class="grid-auto projects-grid" appReveal revealStagger [revealDelay]="200">
             @for (project of filtered(); track project.id) {
               <article class="reveal-item projects-grid__item" [style.--i]="$index">
                 <p-card class="project-card hover-lift">

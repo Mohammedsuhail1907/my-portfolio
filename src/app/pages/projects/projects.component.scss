@@ -29,7 +29,7 @@
 // Cards re-enter (staggered) whenever the filter re-renders them, not only on the first reveal.
 .projects-grid.is-visible .projects-grid__item {
   animation: enter-up var(--dur-slow) var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * var(--stagger-step));
+  animation-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger-step));
 }
 
 .project-card {
