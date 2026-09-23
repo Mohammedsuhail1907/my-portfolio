@@ -149,12 +149,35 @@
   animation: vt-in 280ms var(--ease-out) both;
 }
 
-// The header is captured separately so it stays put while the page below transitions.
-.site-header {
-  view-transition-name: site-header;
+// Theme switch ----------------------------------------------------------------------
+// ThemeService prefers a circular reveal (View Transitions API): the new colour scheme expands
+// from the toggle (--theme-x/--theme-y) until it covers the viewport (--theme-r). Both snapshots
+// are opaque, so the default cross-fade blending is switched off and the old one simply sits
+// underneath until it is covered.
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--theme-x) var(--theme-y));
+  }
+
+  to {
+    clip-path: circle(var(--theme-r) at var(--theme-x) var(--theme-y));
+  }
 }
 
-// Theme switch: ThemeService adds this class for one beat so colours cross-fade.
+html.theme-reveal {
+  &::view-transition-old(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  &::view-transition-new(root) {
+    animation: theme-reveal var(--dur-theme) var(--ease-standard);
+    mix-blend-mode: normal;
+  }
+}
+
+// Fallback without View Transitions: ThemeService holds this class for one beat so colours
+// cross-fade instead.
 html.theme-transition,
 html.theme-transition *,
 html.theme-transition *::before,

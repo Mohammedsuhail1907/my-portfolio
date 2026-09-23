@@ -1,8 +1,11 @@
 <a class="skip-link" href="#main-content">Skip to content</a>
 
-<div class="app">
-  <app-header />
+<!-- Fixed controls first so they are early in the tab order, where the header used to be. -->
+<app-theme-toggle />
 
+<app-ambient-background />
+
+<div class="app">
   <main id="main-content" class="site-main" tabindex="-1">
     <router-outlet />
   </main>

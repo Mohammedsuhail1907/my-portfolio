@@ -1,0 +1,15 @@
+<button
+  #btn
+  type="button"
+  class="theme-toggle"
+  [class.theme-toggle--dark]="isDark()"
+  [attr.aria-label]="label()"
+  [pTooltip]="label()"
+  tooltipPosition="left"
+  (click)="toggle(btn)"
+>
+  <span class="theme-toggle__icons" aria-hidden="true">
+    <i class="pi pi-moon theme-toggle__icon theme-toggle__icon--moon"></i>
+    <i class="pi pi-sun theme-toggle__icon theme-toggle__icon--sun"></i>
+  </span>
+</button>

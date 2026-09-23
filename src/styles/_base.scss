@@ -27,8 +27,6 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
-  // Keeps anchored sections clear of the fixed header for scrollIntoView / :target scrolling.
-  scroll-padding-top: calc(var(--header-h) + 1rem);
 }
 
 body {

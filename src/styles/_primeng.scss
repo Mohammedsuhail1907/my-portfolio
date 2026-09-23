@@ -22,15 +22,12 @@
   font-weight: 500;
 }
 
-.p-drawer.site-drawer {
-  width: min(20rem, 88vw);
-}
-
 .p-toast {
   max-width: calc(100vw - 2rem);
 }
 
+// Bottom-right, mirroring the floating theme toggle in the top-right corner.
 .p-scrolltop.site-scrolltop {
-  right: 1.25rem;
-  bottom: 1.25rem;
+  right: var(--floating-inset);
+  bottom: var(--floating-inset);
 }

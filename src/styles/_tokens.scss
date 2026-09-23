@@ -23,15 +23,23 @@
 
   // Surfaces ----------------------------------------------------------------
   --surface-page: #ffffff;
-  --surface-alt: #f8fafc;           // slate-50 — alternating sections
+  --surface-alt: rgba(248, 250, 252, 0.6);    // slate-50, translucent: alternating sections let the ambient backdrop through
   --surface-card: #ffffff;
   --surface-card-hover: #ffffff;
   --surface-inset: #f1f5f9;         // slate-100 — chips, inputs on cards
-  --surface-header: rgba(255, 255, 255, 0.85);
+  --surface-glass: rgba(255, 255, 255, 0.72); // floating controls over a blurred backdrop
   --surface-footer: #0f172a;        // slate-900
   --border-color: #e2e8f0;          // slate-200
   --border-hover: #bfdbfe;          // blue-200
   --border-strong: #cbd5e1;         // slate-300
+
+  // Ambient backdrop (shared/ambient-background). Keep these faint: body text
+  // must stay readable over the brightest point of every blob.
+  --ambient-tint: rgba(37, 99, 235, 0.05);
+  --ambient-1: rgba(37, 99, 235, 0.14);       // blue-600
+  --ambient-2: rgba(124, 58, 237, 0.11);      // violet-600
+  --ambient-3: rgba(14, 165, 233, 0.09);      // sky-500
+  --ambient-grid: rgba(15, 23, 42, 0.07);
 
   // Text --------------------------------------------------------------------
   --text-strong: #0f172a;           // slate-900 — headings
@@ -78,7 +86,7 @@
   // Layout ------------------------------------------------------------------
   --container-max: 72rem;
   --container-pad: 1rem;
-  --header-h: 4rem;
+  --floating-inset: 1rem;           // fixed controls' distance from the viewport edge (scales in _layout.scss)
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -93,12 +101,13 @@
   --dur-fast: 150ms;
   --dur-base: 250ms;
   --dur-slow: 450ms;
+  --dur-theme: 600ms;               // theme reveal (see _motion.scss)
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --stagger-step: 60ms;
 
   // Layers ------------------------------------------------------------------
-  --z-header: 100;
+  --z-floating: 100;                // theme toggle; PrimeNG overlays (toast, dialog mask) sit above 1000
   --z-skip-link: 1200;
 
   --focus-ring: var(--brand);
@@ -119,15 +128,21 @@
   --error: #f87171;
 
   --surface-page: #020617;          // slate-950
-  --surface-alt: #0a1122;
+  --surface-alt: rgba(15, 23, 42, 0.45);      // slate-900, translucent
   --surface-card: #0f172a;          // slate-900 (= PrimeNG dark content background)
   --surface-card-hover: #13203a;
   --surface-inset: #1e293b;         // slate-800
-  --surface-header: rgba(2, 6, 23, 0.8);
+  --surface-glass: rgba(15, 23, 42, 0.72);
   --surface-footer: #020617;
   --border-color: #1e293b;          // slate-800
   --border-hover: rgba(96, 165, 250, 0.45);
   --border-strong: #334155;
+
+  --ambient-tint: rgba(96, 165, 250, 0.07);
+  --ambient-1: rgba(96, 165, 250, 0.2);       // blue-400
+  --ambient-2: rgba(167, 139, 250, 0.16);     // violet-400
+  --ambient-3: rgba(56, 189, 248, 0.13);      // sky-400
+  --ambient-grid: rgba(148, 163, 184, 0.08);
 
   --text-strong: #f1f5f9;
   --text-body: #cbd5e1;

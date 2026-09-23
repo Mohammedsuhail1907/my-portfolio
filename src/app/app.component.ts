@@ -3,12 +3,20 @@ import { RouterOutlet } from '@angular/router';
 import { ScrollTop } from 'primeng/scrolltop';
 import { Toast } from 'primeng/toast';
 import { FooterComponent } from './pages/footer/footer.component';
-import { HeaderComponent } from './pages/header/header.component';
 import { ThemeService } from './services/theme.service';
+import { AmbientBackgroundComponent } from './shared/ambient-background/ambient-background.component';
+import { ThemeToggleComponent } from './shared/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'app-root',
-  imports: [HeaderComponent, FooterComponent, RouterOutlet, Toast, ScrollTop],
+  imports: [
+    ThemeToggleComponent,
+    AmbientBackgroundComponent,
+    FooterComponent,
+    RouterOutlet,
+    Toast,
+    ScrollTop,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

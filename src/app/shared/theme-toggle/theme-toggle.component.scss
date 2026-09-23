@@ -1,0 +1,89 @@
+@use 'mixins' as *;
+
+// Fixed to the top-right corner on every page: above content, below PrimeNG overlays.
+:host {
+  position: fixed;
+  top: var(--floating-inset);
+  right: var(--floating-inset);
+  z-index: var(--z-floating);
+  // Enters alongside the hero (global `enter-scale` keyframes). `backwards` keeps it hidden during
+  // the delay and, unlike `forwards`, hands control back to the hover/active transforms afterwards.
+  animation: enter-scale 0.7s var(--ease-out) 540ms backwards;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem; // 44px tap target
+  height: 2.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: var(--surface-glass);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: var(--text-body);
+  box-shadow: var(--shadow-md);
+  transition:
+    color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+
+  @include can-hover {
+    &:hover {
+      color: var(--brand);
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+  }
+
+  &:active {
+    transform: scale(0.94);
+  }
+}
+
+// Both glyphs share one box; the inactive one is rotated away and faded out, so a switch spins
+// the new icon in.
+.theme-toggle__icons {
+  position: relative;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.theme-toggle__icon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.125rem;
+  line-height: 1;
+  transition:
+    transform var(--dur-slow) var(--ease-out),
+    opacity var(--dur-base) var(--ease-standard);
+}
+
+.theme-toggle__icon--sun {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.4);
+}
+
+.theme-toggle--dark {
+  .theme-toggle__icon--moon {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.4);
+  }
+
+  .theme-toggle__icon--sun {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@include motion-reduce {
+  :host {
+    animation: none;
+  }
+}

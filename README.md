@@ -2,8 +2,10 @@
 
 Personal portfolio built with **Angular 20**, **PrimeNG 20** and a small custom SCSS design system.
 Single-page layout (hero → about → skills → contact) with smooth section navigation, scroll-reveal
-animations, light/dark theme and an EmailJS-powered contact form. There is exactly one route (the
-root) — section links scroll the page in place and never change the URL.
+animations, an ambient animated backdrop, a floating light/dark toggle and an EmailJS-powered
+contact form. There is no menu bar: the hero's calls to action, the scroll cue and the footer's
+Quick Links move between sections. There is exactly one route (the root) — section links scroll
+the page in place and never change the URL.
 
 ## Requirements
 
@@ -40,10 +42,11 @@ src/
     models/                  Skill/Project/PortfolioData types shared by the service and components
     data/                    Editable content that isn't Skills/Projects: about, experience, tech icons
     services/                PortfolioDataService (skills/projects), ThemeService (light/dark),
-                             NavigationService (in-page scroll, scroll-spy — never touches the URL)
+                             NavigationService (in-page scroll — never touches the URL)
     directives/              RevealDirective (IntersectionObserver reveal-on-scroll)
-    shared/                  SectionHeading, TechIcon
-    pages/                   header, hero, about, experience, skills, projects, contact, footer, home
+    shared/                  SectionHeading, TechIcon, ThemeToggle (floating light/dark switch),
+                             AmbientBackground (animated backdrop behind every page)
+    pages/                   hero, about, experience, skills, projects, contact, footer, home
   assets/
     data/portfolio.json      Skills and Projects content (see PortfolioDataService)
     fonts/                   Inter Variable (latin), self-hosted
@@ -76,6 +79,11 @@ Everything visible on the site is data, not markup:
 `localStorage` under `portfolio-theme`). The `.app-dark` class on `<html>` switches both the
 design tokens and PrimeNG's dark scheme; `index.html` applies it before first paint to avoid a
 flash.
+
+The toggle is the floating button in the top-right corner (`shared/theme-toggle`). Switching
+animates a circular reveal of the new scheme out from the button (View Transitions API) and falls
+back to a colour cross-fade where that is unsupported; both are skipped under
+`prefers-reduced-motion`, as is the drifting of the ambient backdrop (`shared/ambient-background`).
 
 ## Deployment (Netlify or any static host)
 

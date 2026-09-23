@@ -1,0 +1,99 @@
+@use 'mixins' as *;
+
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+  // Soft brand wash from the top, so the page never reads as flat white / black.
+  background: radial-gradient(ellipse 90% 55% at 50% -15%, var(--ambient-tint), transparent 70%);
+}
+
+// Faint dot grid, fading out towards the bottom of the viewport.
+.ambient__grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--ambient-grid) 1px, transparent 1.5px);
+  background-size: 28px 28px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
+}
+
+// Blobs: large radial gradients with a long transparent falloff give soft edges without
+// `filter: blur()`, which is expensive on mobile. Only `transform` animates.
+.ambient__blob {
+  position: absolute;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle at center, var(--blob) 0%, transparent 62%);
+  will-change: transform;
+  animation: ambient-drift var(--duration) var(--ease-standard) var(--delay, 0s) infinite alternate;
+}
+
+.ambient__blob--1 {
+  --blob: var(--ambient-1);
+  --duration: 26s;
+
+  top: -22vmax;
+  right: -14vmax;
+  width: 64vmax;
+  height: 64vmax;
+}
+
+.ambient__blob--2 {
+  --blob: var(--ambient-2);
+  --duration: 34s;
+  --delay: -11s;
+
+  bottom: -24vmax;
+  left: -18vmax;
+  width: 60vmax;
+  height: 60vmax;
+  animation-name: ambient-drift-alt;
+}
+
+.ambient__blob--3 {
+  --blob: var(--ambient-3);
+  --duration: 40s;
+  --delay: -20s;
+
+  top: 30%;
+  left: 38%;
+  width: 44vmax;
+  height: 44vmax;
+}
+
+@keyframes ambient-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(-6vmax, 5vmax, 0) scale(1.08);
+  }
+
+  100% {
+    transform: translate3d(4vmax, -3vmax, 0) scale(0.95);
+  }
+}
+
+@keyframes ambient-drift-alt {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(7vmax, -6vmax, 0) scale(0.94);
+  }
+
+  100% {
+    transform: translate3d(-3vmax, 4vmax, 0) scale(1.06);
+  }
+}
+
+@include motion-reduce {
+  .ambient__blob {
+    animation: none;
+  }
+}
