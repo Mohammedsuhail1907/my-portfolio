@@ -1,5 +1,6 @@
 import { DOCUMENT, Injectable, inject } from '@angular/core';
 import { SectionDef, homeSections } from '../config/site.config';
+import { REVEAL_REPLAY_EVENT } from '../directives/reveal.directive';
 
 /** Section id of the Home page (the hero). */
 const HOME_ID = 'home';
@@ -73,8 +74,9 @@ export class NavigationService {
   /**
    * Hides the destination (zoomed out) for the duration of the scroll, then plays its entrance
    * once the scroll settles — `scrollend` where supported, a timer otherwise — so it zooms into
-   * the viewport on arrival rather than mid-flight. The entrance class is removed again when its
-   * animation ends, so a later navigation can replay it.
+   * the viewport on arrival rather than mid-flight, with its inner reveals cascading in rather
+   * than standing already revealed. The entrance class is removed again when its animation ends,
+   * so a later navigation can replay it.
    */
   private stageEntrance(section: HTMLElement): void {
     this.cancelEntrance?.();
@@ -98,6 +100,9 @@ export class NavigationService {
       section.classList.remove(ENTER_PENDING_CLASS);
       section.classList.add(ENTER_CLASS);
       section.addEventListener('animationend', onAnimationEnd);
+      // The section's reveals already fired (invisibly) while the page scrolled by, so replay
+      // them now: its components cascade in with the entrance instead of standing revealed.
+      window.dispatchEvent(new CustomEvent(REVEAL_REPLAY_EVENT, { detail: { root: section } }));
     };
 
     timer = setTimeout(arrive, SCROLL_SETTLE_MS);

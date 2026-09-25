@@ -39,7 +39,7 @@
         @default {
           <ul class="grid-auto skills-grid" role="list" appReveal revealStagger [revealDelay]="120">
             @for (category of categories(); track category.id) {
-              <li class="skills-grid__item reveal-item" [style.--i]="$index">
+              <li class="skills-grid__item reveal-item reveal-item--scale" [style.--i]="$index">
                 <p-card class="skill-card hover-lift">
                   <div class="skill-card__head">
                     <span class="icon-tile skill-card__icon">

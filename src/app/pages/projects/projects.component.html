@@ -52,7 +52,7 @@
 
           <div class="grid-auto projects-grid" appReveal revealStagger [revealDelay]="200">
             @for (project of filtered(); track project.id) {
-              <article class="reveal-item projects-grid__item" [style.--i]="$index">
+              <article class="reveal-item reveal-item--scale projects-grid__item" [style.--i]="$index">
                 <p-card class="project-card hover-lift">
                   <ng-template #header>
                     <div class="project-card__media">

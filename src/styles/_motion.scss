@@ -38,7 +38,10 @@
 
 // Scroll reveal (driven by RevealDirective) ------------------------------------
 // `--reveal-delay` is set by the directive and inherited, so items of a delayed group — and
-// reveals nested inside a delayed one — start after their parent.
+// reveals nested inside a delayed one — start after their parent. Reveals are transitions, not
+// one-shot animations: the directive re-arms them once an element fully leaves a padded
+// viewport, so scrolling back replays a section's entrance (and reversing mid-transition is
+// smooth by nature).
 .reveal {
   opacity: 0;
   transform: translateY(20px);
@@ -72,7 +75,8 @@
 }
 
 // Staggered children: the group host gets `.reveal-group`, each child `.reveal-item`
-// with `[style.--i]="$index"`.
+// with `[style.--i]="$index"`. Modifiers pick the direction an item enters from, so one group
+// can mix directions (cards scaling in while their markers rise, and so on).
 .reveal-group .reveal-item {
   opacity: 0;
   transform: translateY(16px);
@@ -80,6 +84,18 @@
     opacity var(--dur-slow) var(--ease-out),
     transform var(--dur-slow) var(--ease-out);
   transition-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger-step));
+}
+
+.reveal-group .reveal-item--left {
+  transform: translateX(-28px);
+}
+
+.reveal-group .reveal-item--right {
+  transform: translateX(28px);
+}
+
+.reveal-group .reveal-item--scale {
+  transform: scale(0.92);
 }
 
 .reveal-group.is-visible .reveal-item {
