@@ -6,6 +6,7 @@ import { ContactComponent } from '../contact/contact.component';
 import { ExperienceComponent } from '../experience/experience.component';
 import { HeroComponent } from '../hero/hero.component';
 import { ProjectsComponent } from '../projects/projects.component';
+import { ServicesComponent } from '../services/services.component';
 import { SkillsComponent } from '../skills/skills.component';
 
 /**
@@ -21,6 +22,7 @@ import { SkillsComponent } from '../skills/skills.component';
     AboutComponent,
     ExperienceComponent,
     SkillsComponent,
+    ServicesComponent,
     ProjectsComponent,
     ContactComponent,
   ],
@@ -31,6 +33,7 @@ import { SkillsComponent } from '../skills/skills.component';
       <app-experience />
     }
     <app-skills />
+    <app-services />
     @if (showProjects) {
       <app-projects />
     }

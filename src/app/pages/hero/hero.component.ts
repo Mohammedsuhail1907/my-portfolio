@@ -51,8 +51,8 @@ export class HeroComponent {
   /** Placeholder chip widths (rem) while the highlights load. */
   protected readonly chipPlaceholders = [6.5, 7.5, 4.5, 5, 4.5];
 
-  /** Secondary call to action: the Projects section when it is enabled, otherwise Skills. */
+  /** Secondary call to action: the Projects section when it is enabled, otherwise Services. */
   protected readonly secondaryAction: HeroAction = SITE.features.projects
     ? { label: 'View My Work', sectionId: 'projects' }
-    : { label: 'See My Skills', sectionId: 'skills' };
+    : { label: 'Explore My Services', sectionId: 'services' };
 }

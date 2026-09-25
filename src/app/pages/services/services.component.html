@@ -1,0 +1,32 @@
+<section id="services" class="section section--bordered" aria-labelledby="services-title">
+  <div class="container">
+    <app-section-heading
+      eyebrow="Services"
+      title="My Services"
+      lead="From the first line of code to long-term support: I design, build, maintain, and improve complete digital products."
+      titleId="services-title"
+    />
+
+    <div class="section__body">
+      <ul class="grid-auto services-grid" role="list" appReveal revealStagger [revealDelay]="120">
+        @for (service of services; track service.title) {
+          <li
+            class="services-grid__item reveal-item"
+            [class.reveal-item--left]="$index % 3 === 0"
+            [class.reveal-item--scale]="$index % 3 === 1"
+            [class.reveal-item--right]="$index % 3 === 2"
+            [style.--i]="$index"
+          >
+            <p-card class="service-card hover-lift">
+              <span class="icon-tile service-card__icon">
+                <i [class]="service.icon" aria-hidden="true"></i>
+              </span>
+              <h3 class="service-card__title">{{ service.title }}</h3>
+              <p class="text-muted service-card__desc">{{ service.description }}</p>
+            </p-card>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</section>
