@@ -21,10 +21,11 @@ const BAND_MARGIN = 0.25;
  * URL fragment, so the address bar always stays at the site root (see AppComponent /
  * app.routes.ts). `items` are the navigable sections (hidden sections are excluded automatically).
  *
- * Leaving the Home page is cinematic: the smooth scroll itself drives the Home page's zoom
- * (HomeZoomDirective), and the destination is held zoomed out and hidden while the page scrolls,
- * then zooms into the viewport once the scroll settles. Navigation between any other two
- * sections is a plain scroll, and nothing is staged under `prefers-reduced-motion`.
+ * Leaving the Home page is cinematic: the smooth scroll travels the pinned zoom runway, so it
+ * drives the Home page's zoom (HomeZoomDirective), and the destination is held zoomed out and
+ * hidden while the page scrolls, then zooms into the viewport once the scroll settles.
+ * Navigation between any other two sections is a plain scroll, and nothing is staged under
+ * `prefers-reduced-motion`.
  */
 @Injectable({ providedIn: 'root' })
 export class NavigationService {
@@ -51,7 +52,10 @@ export class NavigationService {
       this.stageEntrance(element);
     }
 
-    const top = element.getBoundingClientRect().top + window.scrollY;
+    // A section inside a zoom stage (Home) may currently be pinned partway down its runway, so
+    // its own rect is not where it rests; the stage, plain flow, marks the real destination.
+    const anchor = element.closest<HTMLElement>('.home-zoom') ?? element;
+    const top = anchor.getBoundingClientRect().top + window.scrollY;
     window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? 'auto' : 'smooth' });
   }
 

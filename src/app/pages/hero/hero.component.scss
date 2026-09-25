@@ -12,6 +12,10 @@
   display: block;
 }
 
+// The zoom stage around the section needs no styles of its own: the runway and the sticky pin
+// come from the global `.home-zoom--pinned` rules in styles/_motion.scss (armed by
+// HomeZoomDirective), so without JS or with reduced motion it is a plain wrapper.
+
 .hero {
   display: grid;
   align-items: center;

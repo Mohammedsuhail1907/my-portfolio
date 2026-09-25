@@ -1,116 +1,119 @@
-<section id="home" class="hero section" aria-labelledby="hero-title" appHomeZoom>
-  <div class="container">
-    <div class="grid-2 hero__grid">
-      <div class="hero__content">
-        <p class="eyebrow hero__greeting enter" [style.--i]="0">{{ site.greeting }}</p>
-        <h1 id="hero-title" class="hero__name enter" [style.--i]="1">{{ site.name }}</h1>
-        <p class="hero__role gradient-text enter" [style.--i]="2">{{ site.role }}</p>
-        <p class="lead text-muted hero__tagline enter" [style.--i]="3">{{ site.tagline }}</p>
+<!-- The stage is what scrolls; the section pins inside it while the zoom scrubs (HomeZoomDirective). -->
+<div class="hero__stage" appHomeZoom>
+  <section id="home" class="hero section" aria-labelledby="hero-title">
+    <div class="container">
+      <div class="grid-2 hero__grid">
+        <div class="hero__content">
+          <p class="eyebrow hero__greeting enter" [style.--i]="0">{{ site.greeting }}</p>
+          <h1 id="hero-title" class="hero__name enter" [style.--i]="1">{{ site.name }}</h1>
+          <p class="hero__role gradient-text enter" [style.--i]="2">{{ site.role }}</p>
+          <p class="lead text-muted hero__tagline enter" [style.--i]="3">{{ site.tagline }}</p>
 
-        @let chips = highlights();
-        <ul
-          role="list"
-          class="cluster hero__tech enter"
-          aria-label="Core technologies"
-          [style.--i]="4"
-          [attr.aria-busy]="chips.status === 'loading' ? 'true' : null"
-        >
-          @if (chips.status === 'ready') {
-            @for (skill of chips.value; track skill.name) {
-              <li>
-                <p-chip>
-                  <span class="chip-body">
-                    <app-tech-icon
-                      [name]="skill.icon"
-                      [fallback]="skill.fallbackIcon ?? 'pi pi-code'"
-                      [size]="16"
-                    />
-                    <span>{{ skill.name }}</span>
-                  </span>
-                </p-chip>
-              </li>
-            }
-          } @else if (chips.status === 'loading') {
-            @for (width of chipPlaceholders; track $index) {
-              <li>
-                <p-skeleton [width]="width + 'rem'" height="2rem" borderRadius="999px" />
-              </li>
-            }
-          }
-        </ul>
-
-        <div class="cluster hero__actions enter" [style.--i]="5">
-          <button
-            type="button"
-            pButton
-            (click)="navigation.scrollTo('contact')"
-            label="Get In Touch"
-            icon="pi pi-arrow-right"
-            iconPos="right"
-          ></button>
-          <button
-            type="button"
-            pButton
-            [outlined]="true"
-            severity="secondary"
-            (click)="navigation.scrollTo(secondaryAction.sectionId)"
-            [label]="secondaryAction.label"
-          ></button>
-        </div>
-
-        <div class="cluster hero__meta-row enter" [style.--i]="6">
-          <ul role="list" class="cluster hero__socials" aria-label="Social profiles">
-            @for (social of site.socials; track social.id) {
-              <li>
-                <a
-                  pButton
-                  class="hero__social"
-                  [text]="true"
-                  [rounded]="true"
-                  severity="secondary"
-                  [icon]="social.icon"
-                  [href]="social.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  [attr.aria-label]="social.label"
-                  [pTooltip]="social.label"
-                  tooltipPosition="bottom"
-                ></a>
-              </li>
+          @let chips = highlights();
+          <ul
+            role="list"
+            class="cluster hero__tech enter"
+            aria-label="Core technologies"
+            [style.--i]="4"
+            [attr.aria-busy]="chips.status === 'loading' ? 'true' : null"
+          >
+            @if (chips.status === 'ready') {
+              @for (skill of chips.value; track skill.name) {
+                <li>
+                  <p-chip>
+                    <span class="chip-body">
+                      <app-tech-icon
+                        [name]="skill.icon"
+                        [fallback]="skill.fallbackIcon ?? 'pi pi-code'"
+                        [size]="16"
+                      />
+                      <span>{{ skill.name }}</span>
+                    </span>
+                  </p-chip>
+                </li>
+              }
+            } @else if (chips.status === 'loading') {
+              @for (width of chipPlaceholders; track $index) {
+                <li>
+                  <p-skeleton [width]="width + 'rem'" height="2rem" borderRadius="999px" />
+                </li>
+              }
             }
           </ul>
-          <span class="hero__meta">
-            <i class="pi pi-map-marker" aria-hidden="true"></i>
-            {{ site.location }}
-          </span>
+
+          <div class="cluster hero__actions enter" [style.--i]="5">
+            <button
+              type="button"
+              pButton
+              (click)="navigation.scrollTo('contact')"
+              label="Get In Touch"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+            ></button>
+            <button
+              type="button"
+              pButton
+              [outlined]="true"
+              severity="secondary"
+              (click)="navigation.scrollTo(secondaryAction.sectionId)"
+              [label]="secondaryAction.label"
+            ></button>
+          </div>
+
+          <div class="cluster hero__meta-row enter" [style.--i]="6">
+            <ul role="list" class="cluster hero__socials" aria-label="Social profiles">
+              @for (social of site.socials; track social.id) {
+                <li>
+                  <a
+                    pButton
+                    class="hero__social"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="secondary"
+                    [icon]="social.icon"
+                    [href]="social.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    [attr.aria-label]="social.label"
+                    [pTooltip]="social.label"
+                    tooltipPosition="bottom"
+                  ></a>
+                </li>
+              }
+            </ul>
+            <span class="hero__meta">
+              <i class="pi pi-map-marker" aria-hidden="true"></i>
+              {{ site.location }}
+            </span>
+          </div>
+        </div>
+
+        <div class="hero__visual">
+          <span class="hero__orb hero__orb--1 float" aria-hidden="true"></span>
+          <span class="hero__orb hero__orb--2 float" aria-hidden="true"></span>
+          <figure class="hero__portrait enter enter--scale" [style.--i]="2">
+            <img
+              class="float"
+              [src]="site.portrait.src"
+              [alt]="site.portrait.alt"
+              width="800"
+              height="1421"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </figure>
         </div>
       </div>
-
-      <div class="hero__visual">
-        <span class="hero__orb hero__orb--1 float" aria-hidden="true"></span>
-        <span class="hero__orb hero__orb--2 float" aria-hidden="true"></span>
-        <figure class="hero__portrait enter enter--scale" [style.--i]="2">
-          <img
-            class="float"
-            [src]="site.portrait.src"
-            [alt]="site.portrait.alt"
-            width="800"
-            height="1421"
-            fetchpriority="high"
-            decoding="async"
-          />
-        </figure>
-      </div>
     </div>
-  </div>
 
-  <button
-    type="button"
-    class="hero__scroll enter enter--fade"
-    [style.--i]="8"
-    (click)="navigation.scrollTo('about')"
-    aria-label="Scroll to the About section"
-  >
-    <i class="pi pi-arrow-down" aria-hidden="true"></i>
-  </button>
-</section>
+    <button
+      type="button"
+      class="hero__scroll enter enter--fade"
+      [style.--i]="8"
+      (click)="navigation.scrollTo('about')"
+      aria-label="Scroll to the About section"
+    >
+      <i class="pi pi-arrow-down" aria-hidden="true"></i>
+    </button>
+  </section>
+</div>

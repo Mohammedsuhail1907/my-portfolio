@@ -4,10 +4,35 @@
 
 // Home page zoom (HomeZoomDirective) --------------------------------------------------------
 // Scrubbed by the scroll position, not timed: the directive writes transform-origin (the
-// pointer), scale and opacity inline as the visitor scrolls away from Home and back. Only the
-// inner .container scales, clipped by the section, so nothing spills over the next section.
-// The layer hint is on only while a zoom is in progress.
-.home-zoom.is-zooming > .container {
+// pointer), scale and opacity inline as the visitor scrolls through the runway and back.
+//
+// The directive arms the stage with `home-zoom--pinned` (JS on, motion-safe only — without it
+// the page sits in normal flow with no dead scroll distance). Armed, the stage grows a runway of
+// `--home-zoom-distance` viewport-heights below the section and the section pins to the viewport
+// (sticky) while the visitor scrolls through it: the page holds still, the scroll drives the
+// zoom, and the next section arrives in normal flow only once the runway — and with it the zoom
+// — is spent. `--home-zoom-pin-top` (set by the directive) pins a page taller than the viewport
+// by its bottom edge instead, so the zoom starts after all of it has been seen. Only the inner
+// .container scales, clipped by the section, so nothing spills over the next section. The layer
+// hint is on only while a zoom is in progress.
+.home-zoom.home-zoom--pinned {
+  > section {
+    position: sticky;
+    top: var(--home-zoom-pin-top, 0px);
+  }
+
+  // The runway is a generated spacer, NOT padding: a sticky child can only travel within its
+  // parent's content box, and padding is outside it — with padding the pin would never move.
+  &::after {
+    content: '';
+    display: block;
+    height: calc(100vh * var(--home-zoom-distance, 0.75));
+    // Small-viewport units keep the runway stable while mobile browser chrome collapses.
+    height: calc(100svh * var(--home-zoom-distance, 0.75));
+  }
+}
+
+.home-zoom.is-zooming > section > .container {
   will-change: transform;
 }
 
@@ -306,6 +331,18 @@ html.theme-transition *::after {
     transform: none;
     opacity: 1;
     animation: none;
+  }
+
+  // The zoom pin: the directive disarms itself when the preference flips; this covers the
+  // layout side (no runway, no sticky) even where that event never fires.
+  .home-zoom.home-zoom--pinned {
+    &::after {
+      content: none;
+    }
+
+    > section {
+      position: static;
+    }
   }
 
   // Outranks the Home-scoped route rules above.

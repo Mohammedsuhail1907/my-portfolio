@@ -23,8 +23,8 @@ interface HeroAction {
  * `PortfolioDataService` (skeleton chips hold the row's height while they load); everything else
  * comes from `SITE`. In-page navigation calls `NavigationService.scrollTo` directly (plain buttons
  * — this app has one page and one URL). The entrance uses the global `.enter` classes, which play
- * once on load. Leaving Home is a scroll-driven, pointer-anchored zoom (HomeZoomDirective on the
- * section).
+ * once on load. Leaving Home is a scroll-driven, pointer-anchored zoom: the section pins to the
+ * viewport while the scroll scrubs the zoom (HomeZoomDirective on the stage wrapper).
  */
 @Component({
   selector: 'app-hero',
