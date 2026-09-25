@@ -1,8 +1,11 @@
 <a class="skip-link" href="#main-content">Skip to content</a>
 
-<div class="app">
-  <app-header />
+<!-- Fixed controls first so they are early in the tab order, where the header used to be. -->
+<app-theme-toggle />
 
+<app-ambient-background />
+
+<div class="app">
   <main id="main-content" class="site-main" tabindex="-1">
     <router-outlet />
   </main>
@@ -11,4 +14,4 @@
 </div>
 
 <p-toast position="bottom-right" [life]="5000" />
-<p-scrolltop [threshold]="600" icon="pi pi-chevron-up" styleClass="site-scrolltop" />
+<p-scrolltop [threshold]="scrollTopThreshold" icon="pi pi-chevron-up" styleClass="site-scrolltop" />

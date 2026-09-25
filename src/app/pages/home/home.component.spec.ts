@@ -31,8 +31,10 @@ describe('HomeComponent', () => {
 
   it('renders the always-on sections in order', () => {
     const sections = Array.from(
-      fixture.nativeElement.querySelectorAll('app-hero, app-about, app-skills, app-contact'),
+      fixture.nativeElement.querySelectorAll(
+        'app-hero, app-about, app-skills, app-services, app-contact',
+      ),
     ).map((el) => (el as HTMLElement).tagName.toLowerCase());
-    expect(sections).toEqual(['app-hero', 'app-about', 'app-skills', 'app-contact']);
+    expect(sections).toEqual(['app-hero', 'app-about', 'app-skills', 'app-services', 'app-contact']);
   });
 });

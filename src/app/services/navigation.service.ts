@@ -1,5 +1,18 @@
-import { DOCUMENT, Injectable, OnDestroy, inject, signal } from '@angular/core';
+import { DOCUMENT, Injectable, inject } from '@angular/core';
 import { SectionDef, homeSections } from '../config/site.config';
+import { REVEAL_REPLAY_EVENT } from '../directives/reveal.directive';
+
+/** Section id of the Home page (the hero). */
+const HOME_ID = 'home';
+/** Destination classes of the Home → page transition (see "Page navigation" in _motion.scss). */
+const ENTER_PENDING_CLASS = 'page-enter-pending';
+const ENTER_CLASS = 'page-enter';
+/** Name of the entrance keyframes in _motion.scss. */
+const ENTER_ANIMATION = 'page-enter';
+/** Fallback for browsers without `scrollend`: how long a smooth scroll is allowed to take. */
+const SCROLL_SETTLE_MS = 1200;
+/** Share of the viewport, top and bottom, outside the band that counts as "still on Home". */
+const BAND_MARGIN = 0.25;
 
 /**
  * Section navigation for the single-page layout.
@@ -7,110 +20,105 @@ import { SectionDef, homeSections } from '../config/site.config';
  * This app has exactly one route (the root). Every "navigation" link therefore just scrolls the
  * current page to a section's element — it is a plain button click, not a Router navigation or a
  * URL fragment, so the address bar always stays at the site root (see AppComponent /
- * app.routes.ts). `scrollTo` accounts for the fixed header itself, since there is no
- * router-driven anchor scrolling to do it for us.
+ * app.routes.ts). `items` are the navigable sections (hidden sections are excluded automatically).
  *
- * - `items` are the navigable sections (hidden sections are excluded automatically).
- * - `activeSection` is kept in sync with the section currently under the header (scroll-spy);
- *   HomeComponent calls `observe()` after its sections render.
+ * Leaving the Home page is cinematic: the smooth scroll travels the pinned zoom runway, so it
+ * drives the Home page's zoom (HomeZoomDirective), and the destination is held zoomed out and
+ * hidden while the page scrolls, then zooms into the viewport once the scroll settles.
+ * Navigation between any other two sections is a plain scroll, and nothing is staged under
+ * `prefers-reduced-motion`.
  */
-/** Distance below the header at which the scroll-spy probe line sits. */
-const PROBE_OFFSET = 32;
-/** Extra breathing room below the header when landing on a section. */
-const SCROLL_GAP = 16;
-
 @Injectable({ providedIn: 'root' })
-export class NavigationService implements OnDestroy {
+export class NavigationService {
   private readonly document = inject(DOCUMENT);
-  private observer: IntersectionObserver | null = null;
-  private observedIds: string[] = [];
-  private resizeTimer: ReturnType<typeof setTimeout> | null = null;
-  private readonly onResize = (): void => {
-    if (this.resizeTimer !== null) {
-      clearTimeout(this.resizeTimer);
-    }
-    this.resizeTimer = setTimeout(() => this.createObserver(), 200);
-  };
+  /** Undoes a staged entrance that has not played yet (a newer navigation superseded it). */
+  private cancelEntrance: (() => void) | null = null;
 
   readonly items: SectionDef[] = homeSections();
-  readonly activeSection = signal<string>('home');
-
-  /** Start tracking which of the given section ids is in view. Safe to call repeatedly. */
-  observe(ids: string[]): void {
-    this.disconnect();
-    if (typeof IntersectionObserver === 'undefined') {
-      return;
-    }
-    this.observedIds = ids;
-    this.createObserver();
-    window.addEventListener('resize', this.onResize, { passive: true });
-  }
-
-  disconnect(): void {
-    this.observer?.disconnect();
-    this.observer = null;
-    window.removeEventListener('resize', this.onResize);
-    if (this.resizeTimer !== null) {
-      clearTimeout(this.resizeTimer);
-      this.resizeTimer = null;
-    }
-  }
 
   /**
-   * The observer's root is shrunk to a 1px line just below the header; sections are contiguous,
-   * so exactly one of them crosses that line at any time and it is the active one. Rebuilt on
-   * resize because rootMargin is fixed in pixels.
-   */
-  private createObserver(): void {
-    this.observer?.disconnect();
-    const lineTop = this.headerHeight() + PROBE_OFFSET;
-    const lineBottom = Math.max(0, window.innerHeight - lineTop - 1);
-    this.observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            this.activeSection.set((entry.target as HTMLElement).id);
-          }
-        }
-      },
-      { rootMargin: `-${lineTop}px 0px -${lineBottom}px 0px`, threshold: 0 },
-    );
-    for (const id of this.observedIds) {
-      const element = this.document.getElementById(id);
-      if (element) {
-        this.observer.observe(element);
-      }
-    }
-  }
-
-  /**
-   * Scroll to a section, clearing the fixed header. This is the ONLY section-navigation
-   * mechanism in the app — it never touches `location` (no path, no `#fragment`, no history
-   * entry), which is what keeps the browser's address bar unchanged while navigating.
+   * Scroll a section to the top of the viewport. This is the ONLY section-navigation mechanism
+   * in the app — it never touches `location` (no path, no `#fragment`, no history entry), which
+   * is what keeps the browser's address bar unchanged while navigating.
    */
   scrollTo(id: string): void {
     const element = this.document.getElementById(id);
     if (!element) {
       return;
     }
-    const top = element.getBoundingClientRect().top + window.scrollY - this.headerHeight() - SCROLL_GAP;
     const reduceMotion =
       typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!reduceMotion && id !== HOME_ID && this.isHomeInFocus()) {
+      this.stageEntrance(element);
+    }
+
+    // A section inside a zoom stage (Home) may currently be pinned partway down its runway, so
+    // its own rect is not where it rests; the stage, plain flow, marks the real destination.
+    const anchor = element.closest<HTMLElement>('.home-zoom') ?? element;
+    const top = anchor.getBoundingClientRect().top + window.scrollY;
     window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? 'auto' : 'smooth' });
   }
 
-  /** Current header height in px, read from the `--header-h` token. */
-  headerHeight(): number {
-    const rootStyle = getComputedStyle(this.document.documentElement);
-    const raw = rootStyle.getPropertyValue('--header-h').trim();
-    const value = parseFloat(raw);
-    if (Number.isNaN(value)) {
-      return 64;
+  /** True while the Home page still occupies the middle half of the viewport. */
+  private isHomeInFocus(): boolean {
+    const home = this.document.getElementById(HOME_ID);
+    if (!home) {
+      return false;
     }
-    return raw.endsWith('rem') ? value * parseFloat(rootStyle.fontSize) : value;
+    const { top, bottom } = home.getBoundingClientRect();
+    const inset = window.innerHeight * BAND_MARGIN;
+    return bottom > inset && top < window.innerHeight - inset;
   }
 
-  ngOnDestroy(): void {
-    this.disconnect();
+  /**
+   * Hides the destination (zoomed out) for the duration of the scroll, then plays its entrance
+   * once the scroll settles — `scrollend` where supported, a timer otherwise — so it zooms into
+   * the viewport on arrival rather than mid-flight, with its inner reveals cascading in rather
+   * than standing already revealed. The entrance class is removed again when its animation ends,
+   * so a later navigation can replay it.
+   */
+  private stageEntrance(section: HTMLElement): void {
+    this.cancelEntrance?.();
+    section.classList.add(ENTER_PENDING_CLASS);
+
+    let timer: ReturnType<typeof setTimeout>;
+
+    const onAnimationEnd = (event: AnimationEvent): void => {
+      if (event.animationName === ENTER_ANIMATION) {
+        section.classList.remove(ENTER_CLASS);
+        section.removeEventListener('animationend', onAnimationEnd);
+      }
+    };
+    const settle = (): void => {
+      clearTimeout(timer);
+      window.removeEventListener('scrollend', arrive);
+      this.cancelEntrance = null;
+    };
+    const arrive = (): void => {
+      settle();
+      section.classList.remove(ENTER_PENDING_CLASS);
+      section.classList.add(ENTER_CLASS);
+      section.addEventListener('animationend', onAnimationEnd);
+      // The section's reveals already fired (invisibly) while the page scrolled by, so replay
+      // them now: its components cascade in with the entrance instead of standing revealed.
+      window.dispatchEvent(new CustomEvent(REVEAL_REPLAY_EVENT, { detail: { root: section } }));
+      // Arriving at the LAST section puts the footer in the same viewport; it lives outside the
+      // sections, so it gets its own replay to join the cascade instead of standing revealed.
+      if (this.items[this.items.length - 1]?.id === section.id) {
+        const footer = this.document.querySelector<HTMLElement>('.site-footer');
+        if (footer) {
+          window.dispatchEvent(new CustomEvent(REVEAL_REPLAY_EVENT, { detail: { root: footer } }));
+        }
+      }
+    };
+
+    timer = setTimeout(arrive, SCROLL_SETTLE_MS);
+    window.addEventListener('scrollend', arrive, { once: true });
+    this.cancelEntrance = () => {
+      settle();
+      section.classList.remove(ENTER_PENDING_CLASS, ENTER_CLASS);
+      section.removeEventListener('animationend', onAnimationEnd);
+    };
   }
 }

@@ -1,54 +1,88 @@
 <section id="skills" class="section section--bordered" aria-labelledby="skills-title">
   <div class="container">
-    <div appReveal>
-      <app-section-heading eyebrow="Skills" title="Skills &amp; Technologies" titleId="skills-title" />
-    </div>
+    <app-section-heading eyebrow="Skills" title="Skills &amp; Technologies" titleId="skills-title" />
 
     <div class="section__body">
-      <ul class="grid-auto skills-grid" role="list" appReveal revealStagger>
-        @for (category of categories(); track category.id) {
-          <li class="skills-grid__item reveal-item" [style.--i]="$index">
-            <p-card class="skill-card hover-lift">
-              <div class="skill-card__head">
-                <span class="skill-card__icon">
-                  <i [class]="category.icon" aria-hidden="true"></i>
-                </span>
-                <h3 class="skill-card__title">{{ category.title }}</h3>
-              </div>
-
-              <ul class="skill-list stack" role="list">
-                @for (skill of category.skills; track skill.name) {
-                  <li class="skill tech-brand-on-hover" [class.skill--dark-brand]="skill.darkBrand">
-                    <app-tech-icon
-                      class="skill__icon"
-                      [name]="skill.icon"
-                      [fallback]="skill.fallbackIcon"
-                      [size]="18"
-                    />
-                    <span class="skill__name">{{ skill.name }}</span>
-                    <p-tag
-                      class="skill__tier"
-                      [value]="skill.tier"
-                      [severity]="skill.severity"
-                      [rounded]="true"
-                    />
-                  </li>
-                }
-              </ul>
-            </p-card>
-          </li>
+      @switch (status()) {
+        @case ('loading') {
+          <ul class="grid-auto skills-grid" role="list" aria-busy="true" aria-label="Loading skills">
+            @for (rows of skeletonCards; track $index) {
+              <li class="skills-grid__item">
+                <p-card class="skill-card">
+                  <div class="skill-card__head">
+                    <p-skeleton shape="circle" size="2.5rem" />
+                    <p-skeleton width="8rem" height="1.25rem" />
+                  </div>
+                  <ul class="skill-list stack" role="list">
+                    @for (row of rows; track row) {
+                      <li class="skill skill--placeholder">
+                        <p-skeleton shape="circle" size="1.125rem" />
+                        <p-skeleton class="skill__name" width="55%" height="1rem" />
+                        <p-skeleton width="4.5rem" height="1.5rem" borderRadius="999px" />
+                      </li>
+                    }
+                  </ul>
+                </p-card>
+              </li>
+            }
+          </ul>
         }
-      </ul>
 
-      <p class="skills-legend text-muted" appReveal="fade" [revealDelay]="240">
-        <span class="visually-hidden">Proficiency levels:</span>
-        @for (item of tiers; track item.tier) {
-          <p-tag [value]="item.tier" [severity]="item.severity" [rounded]="true" />
-          @if (!$last) {
-            <span class="skills-legend__sep" aria-hidden="true">·</span>
-          }
+        @case ('error') {
+          <app-empty-state
+            icon="pi pi-exclamation-circle"
+            message="Skills couldn't be loaded."
+            hint="Please refresh the page to try again."
+          />
         }
-      </p>
+
+        @default {
+          <ul class="grid-auto skills-grid" role="list" appReveal revealStagger [revealDelay]="120">
+            @for (category of categories(); track category.id) {
+              <li class="skills-grid__item reveal-item reveal-item--scale" [style.--i]="$index">
+                <p-card class="skill-card hover-lift">
+                  <div class="skill-card__head">
+                    <span class="icon-tile skill-card__icon">
+                      <i [class]="category.icon" aria-hidden="true"></i>
+                    </span>
+                    <h3 class="skill-card__title">{{ category.title }}</h3>
+                  </div>
+
+                  <ul class="skill-list stack" role="list">
+                    @for (skill of category.skills; track skill.name) {
+                      <li class="skill tech-brand-on-hover" [class.skill--dark-brand]="skill.darkBrand">
+                        <app-tech-icon
+                          class="skill__icon"
+                          [name]="skill.icon"
+                          [fallback]="skill.fallbackIcon"
+                          [size]="18"
+                        />
+                        <span class="skill__name">{{ skill.name }}</span>
+                        <p-tag
+                          class="skill__tier"
+                          [value]="skill.tier"
+                          [severity]="skill.severity"
+                          [rounded]="true"
+                        />
+                      </li>
+                    }
+                  </ul>
+                </p-card>
+              </li>
+            }
+          </ul>
+
+          <p class="skills-legend text-muted" appReveal="fade" [revealDelay]="420">
+            <span class="visually-hidden">Proficiency levels:</span>
+            @for (item of tiers; track item.tier) {
+              <p-tag [value]="item.tier" [severity]="item.severity" [rounded]="true" />
+              @if (!$last) {
+                <span class="skills-legend__sep" aria-hidden="true">·</span>
+              }
+            }
+          </p>
+        }
+      }
     </div>
   </div>
 </section>

@@ -1,9 +1,30 @@
+@use 'mixins' as *;
+
 .app {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
+  // Landing: the page fades in while the hero's content staggers in (the `.enter` classes).
+  // Opacity only — a transform here would become the containing block for fixed overlays.
+  animation: page-land 600ms var(--ease-out) both;
+}
+
+@keyframes page-land {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 #main-content:focus {
   outline: none;
+}
+
+@include motion-reduce {
+  .app {
+    animation: none;
+  }
 }

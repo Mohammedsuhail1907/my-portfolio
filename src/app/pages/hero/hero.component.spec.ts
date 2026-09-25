@@ -42,6 +42,18 @@ describe('HeroComponent', () => {
     expect(element.querySelector('.hero__tagline')?.textContent?.trim()).toBe(SITE.tagline);
   });
 
+  it('offers Services as the secondary call to action while projects are disabled', () => {
+    const scrollSpy = spyOn(navigation, 'scrollTo');
+
+    const cta = Array.from(element.querySelectorAll<HTMLButtonElement>('button[pButton]')).find(
+      (b) => b.textContent?.includes('Explore My Services'),
+    );
+    expect(cta).withContext('the Services CTA should be rendered').toBeDefined();
+    cta?.click();
+
+    expect(scrollSpy).toHaveBeenCalledWith('services');
+  });
+
   it('scrolls to the contact section on click, without touching the URL', () => {
     const scrollSpy = spyOn(navigation, 'scrollTo');
     const before = location.href;

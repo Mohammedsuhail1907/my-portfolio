@@ -13,17 +13,43 @@ import {
 export type RevealVariant = '' | 'up' | 'fade' | 'scale' | 'left' | 'right';
 
 /**
- * Reveals the host once it enters the viewport (IntersectionObserver), by toggling `is-visible`.
+ * Dispatched on `window` (a CustomEvent with detail `{ root: HTMLElement }`) to make every
+ * reveal inside `root` play again. NavigationService fires it when a navigation from Home
+ * arrives, so the destination's components cascade in instead of standing already revealed
+ * behind the page entrance.
+ */
+export const REVEAL_REPLAY_EVENT = 'app-reveal-replay';
+
+/**
+ * How far past the viewport (top and bottom) the host must FULLY leave before its reveal
+ * re-arms. The margin is what keeps small back-and-forth scrolling from ever replaying an
+ * entrance — only genuinely scrolling away and coming back does. Shared with CountUpDirective,
+ * whose count re-arms in step with the tile around it.
+ */
+export const REVEAL_REARM_MARGIN = '25% 0px 25% 0px';
+
+/**
+ * Reveals the host when it enters the viewport (IntersectionObserver), by toggling `is-visible`.
  * The transitions themselves live in `src/styles/_motion.scss`.
  *
  * Usage:
  *   <div appReveal>                       fade + translate up (default)
  *   <div appReveal="fade">                fade only  ('scale' | 'left' | 'right' also available)
  *   <ul appReveal revealStagger>          children with class `reveal-item` and `[style.--i]="$index"`
+ *                                         (items take `reveal-item--left/right/scale` modifiers)
  *   <div appReveal [revealDelay]="120">   extra delay in ms
  *
- * Respects `prefers-reduced-motion` (content shows immediately) and degrades gracefully when
- * IntersectionObserver is unavailable.
+ * The delay is exposed as the inherited `--reveal-delay` custom property, so a staggered group's
+ * items (and any reveal nested inside a delayed one) start after it — that is how each section's
+ * hierarchy is choreographed: heading first (no delay), then body groups, then their items.
+ *
+ * Reveals replay: once the host has fully left a well-padded viewport (`REARM_MARGIN`), the
+ * reveal re-arms, so scrolling back to a section plays its entrance again — but a tiny scroll
+ * jiggle never does. A `REVEAL_REPLAY_EVENT` on `window` replays every reveal inside the event's
+ * `root` immediately (see NavigationService).
+ *
+ * Respects `prefers-reduced-motion` (content shows immediately, nothing ever replays) and
+ * degrades gracefully when IntersectionObserver is unavailable.
  */
 @Directive({
   selector: '[appReveal]',
@@ -35,7 +61,7 @@ export type RevealVariant = '' | 'up' | 'fade' | 'scale' | 'left' | 'right';
     '[class.reveal--left]': 'variant() === "left"',
     '[class.reveal--right]': 'variant() === "right"',
     '[class.is-visible]': 'visible()',
-    '[style.transition-delay.ms]': 'delay() || null',
+    '[style.--reveal-delay]': 'delay() ? delay() + "ms" : null',
   },
 })
 export class RevealDirective implements OnInit, OnDestroy {
@@ -46,7 +72,8 @@ export class RevealDirective implements OnInit, OnDestroy {
   protected readonly visible = signal(false);
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
-  private observer: IntersectionObserver | null = null;
+  private showObserver: IntersectionObserver | null = null;
+  private rearmObserver: IntersectionObserver | null = null;
 
   ngOnInit(): void {
     const reduceMotion =
@@ -57,24 +84,53 @@ export class RevealDirective implements OnInit, OnDestroy {
       return;
     }
 
-    this.observer = new IntersectionObserver(
+    const element = this.host.nativeElement;
+    // Each observer watches exactly one element, so a batched delivery is a time series and
+    // only its LAST entry is current — a janky frame delivering [out, in] must not hide an
+    // element that ended up back on screen.
+    this.showObserver = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
+        if (entries[entries.length - 1].isIntersecting) {
           this.visible.set(true);
-          this.disconnect();
         }
       },
       { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
     );
-    this.observer.observe(this.host.nativeElement);
+    // Separate observer for re-arming: it fires "gone" only when the host has completely left
+    // the padded viewport, which can never overlap with the show observer's "entered".
+    this.rearmObserver = new IntersectionObserver(
+      (entries) => {
+        if (!entries[entries.length - 1].isIntersecting) {
+          this.visible.set(false);
+        }
+      },
+      { rootMargin: REVEAL_REARM_MARGIN },
+    );
+    this.showObserver.observe(element);
+    this.rearmObserver.observe(element);
+    window.addEventListener(REVEAL_REPLAY_EVENT, this.onReplay);
   }
 
   ngOnDestroy(): void {
-    this.disconnect();
+    this.showObserver?.disconnect();
+    this.rearmObserver?.disconnect();
+    this.showObserver = null;
+    this.rearmObserver = null;
+    window.removeEventListener(REVEAL_REPLAY_EVENT, this.onReplay);
   }
 
-  private disconnect(): void {
-    this.observer?.disconnect();
-    this.observer = null;
-  }
+  /** Replays this reveal when the event's root contains the host (and motion is allowed). */
+  private readonly onReplay = (event: Event): void => {
+    const root = (event as CustomEvent<{ root?: HTMLElement }>).detail?.root;
+    const element = this.host.nativeElement;
+    if (!this.showObserver || !root?.contains(element)) {
+      return;
+    }
+    this.visible.set(false);
+    // Re-observing re-delivers the current intersection on the next frame, so a host that is in
+    // the viewport transitions straight back in (with its stagger delays) rather than waiting
+    // for a fresh threshold crossing.
+    this.showObserver.unobserve(element);
+    this.showObserver.observe(element);
+  };
 }

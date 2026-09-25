@@ -2,11 +2,13 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
+import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { SITE } from '../../config/site.config';
-import { Skill } from '../../models/portfolio-data.model';
+import { HomeZoomDirective } from '../../directives/home-zoom.directive';
 import { NavigationService } from '../../services/navigation.service';
 import { PortfolioDataService } from '../../services/portfolio-data.service';
+import { toLoadState } from '../../shared/load-state';
 import { TechIconComponent } from '../../shared/tech-icon/tech-icon.component';
 
 interface HeroAction {
@@ -18,13 +20,22 @@ interface HeroAction {
 /**
  * Above-the-fold introduction: greeting, name, role, tagline, core technologies, calls to
  * action, social links, location and the portrait. Technology chips come from
- * `PortfolioDataService`; everything else comes from `SITE`. In-page navigation calls
- * `NavigationService.scrollTo` directly (plain buttons — this app has one page and one URL).
- * The entrance uses the global `.enter` classes, which play once on load.
+ * `PortfolioDataService` (skeleton chips hold the row's height while they load); everything else
+ * comes from `SITE`. In-page navigation calls `NavigationService.scrollTo` directly (plain buttons
+ * — this app has one page and one URL). The entrance uses the global `.enter` classes, which play
+ * once on load. Leaving Home is a scroll-driven, pointer-anchored zoom: the section pins to the
+ * viewport while the scroll scrubs the zoom (HomeZoomDirective on the stage wrapper).
  */
 @Component({
   selector: 'app-hero',
-  imports: [ButtonModule, ChipModule, TooltipModule, TechIconComponent],
+  imports: [
+    ButtonModule,
+    ChipModule,
+    SkeletonModule,
+    TooltipModule,
+    TechIconComponent,
+    HomeZoomDirective,
+  ],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,12 +45,14 @@ export class HeroComponent {
   private readonly portfolioData = inject(PortfolioDataService);
 
   protected readonly site = SITE;
-  protected readonly highlights = toSignal(this.portfolioData.getHeroHighlights(), {
-    initialValue: [] as Skill[],
+  protected readonly highlights = toSignal(toLoadState(this.portfolioData.getHeroHighlights()), {
+    requireSync: true,
   });
+  /** Placeholder chip widths (rem) while the highlights load. */
+  protected readonly chipPlaceholders = [6.5, 7.5, 4.5, 5, 4.5];
 
-  /** Secondary call to action: the Projects section when it is enabled, otherwise Skills. */
+  /** Secondary call to action: the Projects section when it is enabled, otherwise Services. */
   protected readonly secondaryAction: HeroAction = SITE.features.projects
     ? { label: 'View My Work', sectionId: 'projects' }
-    : { label: 'See My Skills', sectionId: 'skills' };
+    : { label: 'Explore My Services', sectionId: 'services' };
 }

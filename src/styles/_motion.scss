@@ -1,14 +1,54 @@
-// The animation language: reveal-on-scroll, entrance, hover lift, route and theme transitions.
-// Every duration/easing comes from the motion tokens in _tokens.scss.
+// The animation language: scenes, reveal-on-scroll, entrance, hover lift, route and theme
+// transitions. Every duration/easing comes from the motion tokens in _tokens.scss.
 @use 'mixins' as *;
 
+// Home page zoom (HomeZoomDirective) --------------------------------------------------------
+// Scrubbed by the scroll position, not timed: the directive writes transform-origin (the
+// pointer), scale and opacity inline as the visitor scrolls through the runway and back.
+//
+// The directive arms the stage with `home-zoom--pinned` (JS on, motion-safe only — without it
+// the page sits in normal flow with no dead scroll distance). Armed, the stage grows a runway of
+// `--home-zoom-distance` viewport-heights below the section and the section pins to the viewport
+// (sticky) while the visitor scrolls through it: the page holds still, the scroll drives the
+// zoom, and the next section arrives in normal flow only once the runway — and with it the zoom
+// — is spent. `--home-zoom-pin-top` (set by the directive) pins a page taller than the viewport
+// by its bottom edge instead, so the zoom starts after all of it has been seen. Only the inner
+// .container scales, clipped by the section, so nothing spills over the next section. The layer
+// hint is on only while a zoom is in progress.
+.home-zoom.home-zoom--pinned {
+  > section {
+    position: sticky;
+    top: var(--home-zoom-pin-top, 0px);
+  }
+
+  // The runway is a generated spacer, NOT padding: a sticky child can only travel within its
+  // parent's content box, and padding is outside it — with padding the pin would never move.
+  &::after {
+    content: '';
+    display: block;
+    height: calc(100vh * var(--home-zoom-distance, 0.75));
+    // Small-viewport units keep the runway stable while mobile browser chrome collapses.
+    height: calc(100svh * var(--home-zoom-distance, 0.75));
+  }
+}
+
+.home-zoom.is-zooming > section > .container {
+  will-change: transform;
+}
+
 // Scroll reveal (driven by RevealDirective) ------------------------------------
+// `--reveal-delay` is set by the directive and inherited, so items of a delayed group — and
+// reveals nested inside a delayed one — start after their parent. Reveals are transitions, not
+// one-shot animations: the directive re-arms them once an element fully leaves a padded
+// viewport, so scrolling back replays a section's entrance (and reversing mid-transition is
+// smooth by nature).
 .reveal {
   opacity: 0;
   transform: translateY(20px);
   transition:
     opacity var(--dur-slow) var(--ease-out),
     transform var(--dur-slow) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
   will-change: opacity, transform;
 
   &.reveal--fade {
@@ -35,14 +75,27 @@
 }
 
 // Staggered children: the group host gets `.reveal-group`, each child `.reveal-item`
-// with `[style.--i]="$index"`.
+// with `[style.--i]="$index"`. Modifiers pick the direction an item enters from, so one group
+// can mix directions (cards scaling in while their markers rise, and so on).
 .reveal-group .reveal-item {
   opacity: 0;
   transform: translateY(16px);
   transition:
     opacity var(--dur-slow) var(--ease-out),
     transform var(--dur-slow) var(--ease-out);
-  transition-delay: calc(var(--i, 0) * var(--stagger-step));
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger-step));
+}
+
+.reveal-group .reveal-item--left {
+  transform: translateX(-28px);
+}
+
+.reveal-group .reveal-item--right {
+  transform: translateX(28px);
+}
+
+.reveal-group .reveal-item--scale {
+  transform: scale(0.92);
 }
 
 .reveal-group.is-visible .reveal-item {
@@ -85,10 +138,12 @@
   }
 }
 
+// `--enter-base` (set by the hero) holds the stagger back until the page landing fade has begun.
+// `backwards` keeps an element hidden during its delay and, unlike `forwards`, hands control back
+// to normal styles afterwards (hover transforms, the scroll cue fading with the Home page).
 .enter {
-  opacity: 0;
-  animation: enter-up 0.7s var(--ease-out) forwards;
-  animation-delay: calc(var(--i, 0) * 90ms);
+  animation: enter-up 0.7s var(--ease-out) backwards;
+  animation-delay: calc(var(--enter-base, 0ms) + var(--i, 0) * 90ms);
 }
 
 .enter--fade {
@@ -97,6 +152,36 @@
 
 .enter--scale {
   animation-name: enter-scale;
+}
+
+// Ambient float for decorative elements (portrait, orbs, empty-state icons) ------------
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.float {
+  animation: float var(--dur-float) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+// Expanding ring used on the scroll cue and the "current role" timeline marker.
+@keyframes pulse-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
 }
 
 // Interaction utilities -----------------------------------------------------------
@@ -113,7 +198,7 @@
     inset-inline: 0;
     bottom: -2px;
     height: 2px;
-    background: currentColor;
+    background: var(--gradient-brand);
     border-radius: 1px;
     transform: scaleX(0);
     transform-origin: left;
@@ -126,35 +211,103 @@
   }
 }
 
-// Route transitions (View Transitions API; skipped for same-page fragment jumps) -----
-@keyframes vt-out {
-  to {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
+// Page navigation from Home (NavigationService) ---------------------------------------------
+// While the page scrolls to the destination it is held zoomed out and hidden; once the scroll
+// settles it zooms into the viewport. Navigation between any other two sections is untouched.
+.page-enter-pending > .container {
+  transform: scale(0.9);
+  opacity: 0;
 }
 
-@keyframes vt-in {
+.page-enter > .container {
+  animation: page-enter var(--dur-page-enter) var(--ease-out) both;
+}
+
+@keyframes page-enter {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
-::view-transition-old(root) {
-  animation: vt-out 180ms var(--ease-standard) both;
+// Route transitions (Router `withViewTransitions`) — Home page only, see app.config.ts ------
+// Leaving Home: the Home page recedes (1 → 0.85, fading) while the destination zooms in
+// (0.9 → 1). Returning: the previous page fades while Home zooms back in. Every other route
+// change skips the transition entirely.
+@keyframes route-recede {
+  to {
+    opacity: 0;
+    transform: scale(0.85);
+  }
 }
 
-::view-transition-new(root) {
-  animation: vt-in 280ms var(--ease-out) both;
+@keyframes route-fade {
+  to {
+    opacity: 0;
+  }
 }
 
-// The header is captured separately so it stays put while the page below transitions.
-.site-header {
-  view-transition-name: site-header;
+@keyframes route-approach {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
 }
 
-// Theme switch: ThemeService adds this class for one beat so colours cross-fade.
+html.route-home-exit {
+  &::view-transition-old(root) {
+    animation: route-recede 320ms var(--ease-standard) both;
+  }
+
+  &::view-transition-new(root) {
+    animation: route-approach 420ms var(--ease-out) both;
+  }
+}
+
+html.route-home-enter {
+  &::view-transition-old(root) {
+    animation: route-fade 240ms var(--ease-standard) both;
+  }
+
+  &::view-transition-new(root) {
+    animation: route-approach 420ms var(--ease-out) both;
+  }
+}
+
+// Theme switch ----------------------------------------------------------------------
+// ThemeService prefers a circular reveal (View Transitions API): the new colour scheme expands
+// from the toggle (--theme-x/--theme-y) until it covers the viewport (--theme-r). Both snapshots
+// are opaque, so the default cross-fade blending is switched off and the old one simply sits
+// underneath until it is covered.
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--theme-x) var(--theme-y));
+  }
+
+  to {
+    clip-path: circle(var(--theme-r) at var(--theme-x) var(--theme-y));
+  }
+}
+
+html.theme-reveal {
+  &::view-transition-old(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  &::view-transition-new(root) {
+    animation: theme-reveal var(--dur-theme) var(--ease-standard);
+    mix-blend-mode: normal;
+  }
+}
+
+// Fallback without View Transitions: ThemeService holds this class for one beat so colours
+// cross-fade instead.
 html.theme-transition,
 html.theme-transition *,
 html.theme-transition *::before,
@@ -185,8 +338,32 @@ html.theme-transition *::after {
     animation: none;
   }
 
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
+  .float {
     animation: none;
+  }
+
+  .page-enter-pending > .container,
+  .page-enter > .container {
+    transform: none;
+    opacity: 1;
+    animation: none;
+  }
+
+  // The zoom pin: the directive disarms itself when the preference flips; this covers the
+  // layout side (no runway, no sticky) even where that event never fires.
+  .home-zoom.home-zoom--pinned {
+    &::after {
+      content: none;
+    }
+
+    > section {
+      position: static;
+    }
+  }
+
+  // Outranks the Home-scoped route rules above.
+  html::view-transition-old(root),
+  html::view-transition-new(root) {
+    animation: none !important;
   }
 }

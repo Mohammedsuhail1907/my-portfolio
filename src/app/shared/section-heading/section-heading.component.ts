@@ -1,11 +1,15 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { RevealDirective } from '../../directives/reveal.directive';
 
 /**
- * Consistent section header: optional eyebrow label, h2 title and optional lead paragraph.
- * Pass `titleId` and reference it from the section's `aria-labelledby`.
+ * Consistent section header: optional eyebrow label (led by a gradient rule), h2 title and
+ * optional lead paragraph. Reveals itself on scroll (RevealDirective is a host directive), so
+ * sections don't need to wrap it. Pass `titleId` and reference it from the section's
+ * `aria-labelledby`.
  */
 @Component({
   selector: 'app-section-heading',
+  hostDirectives: [RevealDirective],
   template: `
     <div class="section-heading" [class.section-heading--center]="align() === 'center'">
       @if (eyebrow()) {
@@ -20,9 +24,14 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   styles: `
     @use 'mixins' as *;
 
+    :host {
+      display: block;
+    }
+
     .section-heading {
       display: flex;
       flex-direction: column;
+      align-items: flex-start;
       gap: var(--space-3);
       max-width: 40rem;
     }

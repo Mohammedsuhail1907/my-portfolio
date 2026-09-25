@@ -1,18 +1,19 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { SITE } from '../../config/site.config';
 import { EXPERIENCE } from '../../data/experience.data';
-import { NavigationService } from '../../services/navigation.service';
 import { AboutComponent } from '../about/about.component';
 import { ContactComponent } from '../contact/contact.component';
 import { ExperienceComponent } from '../experience/experience.component';
 import { HeroComponent } from '../hero/hero.component';
 import { ProjectsComponent } from '../projects/projects.component';
+import { ServicesComponent } from '../services/services.component';
 import { SkillsComponent } from '../skills/skills.component';
 
 /**
- * The single page of this app: composes every section in order and starts the scroll-spy that
- * keeps the header's active link in sync. Optional sections render only when they have content
- * (Experience) or are enabled (Projects) — see app/config/site.config.ts.
+ * The single page of this app: composes every section in order. The Home page (hero) carries
+ * the scroll-driven zoom (see HeroComponent / HomeZoomDirective); every other section scrolls
+ * normally. Optional sections render only when they have content (Experience) or are enabled
+ * (Projects) — see app/config/site.config.ts.
  */
 @Component({
   selector: 'app-home',
@@ -21,6 +22,7 @@ import { SkillsComponent } from '../skills/skills.component';
     AboutComponent,
     ExperienceComponent,
     SkillsComponent,
+    ServicesComponent,
     ProjectsComponent,
     ContactComponent,
   ],
@@ -31,6 +33,7 @@ import { SkillsComponent } from '../skills/skills.component';
       <app-experience />
     }
     <app-skills />
+    <app-services />
     @if (showProjects) {
       <app-projects />
     }
@@ -38,17 +41,7 @@ import { SkillsComponent } from '../skills/skills.component';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent implements AfterViewInit, OnDestroy {
-  private readonly navigation = inject(NavigationService);
-
+export class HomeComponent {
   protected readonly showExperience = EXPERIENCE.length > 0;
   protected readonly showProjects = SITE.features.projects;
-
-  ngAfterViewInit(): void {
-    this.navigation.observe(this.navigation.items.map((item) => item.id));
-  }
-
-  ngOnDestroy(): void {
-    this.navigation.disconnect();
-  }
 }

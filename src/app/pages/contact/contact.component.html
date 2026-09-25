@@ -4,7 +4,7 @@
 
     <div class="section__body grid-2">
       <div class="contact-info">
-        <div class="contact-intro" appReveal>
+        <div class="contact-intro" appReveal="left" [revealDelay]="120">
           <h3>Let's work together</h3>
           <p class="text-muted">
             I'm always interested in new opportunities and exciting projects. Whether you have a
@@ -12,11 +12,11 @@
           </p>
         </div>
 
-        <ul role="list" class="stack contact-methods" appReveal revealStagger>
-          <li class="reveal-item" [style.--i]="0">
+        <ul role="list" class="stack contact-methods" appReveal revealStagger [revealDelay]="200">
+          <li class="reveal-item reveal-item--left" [style.--i]="0">
             <p-card class="method-card hover-lift">
               <div class="method">
-                <span class="method__icon"><i class="pi pi-envelope" aria-hidden="true"></i></span>
+                <span class="icon-tile method__icon"><i class="pi pi-envelope" aria-hidden="true"></i></span>
                 <div class="method__body">
                   <span class="method__label">Email</span>
                   <a class="method__value" [href]="'mailto:' + site.email">{{ site.email }}</a>
@@ -24,10 +24,10 @@
               </div>
             </p-card>
           </li>
-          <li class="reveal-item" [style.--i]="1">
+          <li class="reveal-item reveal-item--left" [style.--i]="1">
             <p-card class="method-card hover-lift">
               <div class="method">
-                <span class="method__icon"><i class="pi pi-phone" aria-hidden="true"></i></span>
+                <span class="icon-tile method__icon"><i class="pi pi-phone" aria-hidden="true"></i></span>
                 <div class="method__body">
                   <span class="method__label">Phone</span>
                   <a class="method__value" [href]="site.phoneHref">{{ site.phone }}</a>
@@ -35,10 +35,10 @@
               </div>
             </p-card>
           </li>
-          <li class="reveal-item" [style.--i]="2">
+          <li class="reveal-item reveal-item--left" [style.--i]="2">
             <p-card class="method-card hover-lift">
               <div class="method">
-                <span class="method__icon"><i class="pi pi-map-marker" aria-hidden="true"></i></span>
+                <span class="icon-tile method__icon"><i class="pi pi-map-marker" aria-hidden="true"></i></span>
                 <div class="method__body">
                   <span class="method__label">Location</span>
                   <span class="method__value">{{ site.location }}</span>
@@ -48,7 +48,7 @@
           </li>
         </ul>
 
-        <div class="contact-social" appReveal>
+        <div class="contact-social" appReveal [revealDelay]="320">
           <h4>Follow Me</h4>
           <div class="cluster">
             @for (social of site.socials; track social.id) {
@@ -67,7 +67,7 @@
         </div>
       </div>
 
-      <p-card class="contact-form-card" appReveal="fade" [revealDelay]="120">
+      <p-card class="contact-form-card" appReveal="right" [revealDelay]="160">
         <form class="stack contact-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
           <div class="field">
             <label for="name">Name</label>

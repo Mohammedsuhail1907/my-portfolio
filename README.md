@@ -2,8 +2,10 @@
 
 Personal portfolio built with **Angular 20**, **PrimeNG 20** and a small custom SCSS design system.
 Single-page layout (hero → about → skills → contact) with smooth section navigation, scroll-reveal
-animations, light/dark theme and an EmailJS-powered contact form. There is exactly one route (the
-root) — section links scroll the page in place and never change the URL.
+animations, an ambient animated backdrop, a floating light/dark toggle and an EmailJS-powered
+contact form. There is no menu bar: the hero's calls to action, the scroll cue and the footer's
+Quick Links move between sections. There is exactly one route (the root) — section links scroll
+the page in place and never change the URL.
 
 ## Requirements
 
@@ -26,12 +28,16 @@ src/
   index.html                 SEO meta, JSON-LD, font/image preloads, pre-paint theme script
   styles.scss                Global entry — imports the partials below in order
   styles/
-    _tokens.scss             Design tokens (colours, type, spacing, radius, shadows, motion)
-    _mixins.scss             Breakpoints, hover/motion guards, card/lift/eyebrow helpers
-    _base.scss               Reset, typography, focus styles, skip link
+    _tokens.scss             Design tokens (colours, glass surfaces, gradients, type, spacing,
+                             radius, shadows/glows, motion) — separate light and dark sets
+    _mixins.scss             Breakpoints, hover/motion guards, glass-surface, hover-lift,
+                             gradient-border-hover, eyebrow, icon-tile
+    _base.scss               Reset, typography, focus styles, skip link, .icon-tile, .gradient-text
     _layout.scss             .container, .section, .grid-2, .grid-auto, .stack, .cluster
-    _motion.scss             Reveal, entrance, hover, route + theme transitions, reduced motion
-    _primeng.scss            Small PrimeNG adjustments
+    _motion.scss             Reveal, entrance, float, pulse-ring, hover, theme reveal/cross-fade,
+                             reduced motion
+    _primeng.scss            PrimeNG in the design language: glass cards/chips/dialog/toast,
+                             button feedback, form fields, scroll-to-top
   app/
     app.routes.ts            One route (the root) that lazy-loads the page; '**' redirects to it
     app.config.ts            Router, HttpClient, PrimeNG theme, Toast
@@ -40,10 +46,14 @@ src/
     models/                  Skill/Project/PortfolioData types shared by the service and components
     data/                    Editable content that isn't Skills/Projects: about, experience, tech icons
     services/                PortfolioDataService (skills/projects), ThemeService (light/dark),
-                             NavigationService (in-page scroll, scroll-spy — never touches the URL)
-    directives/              RevealDirective (IntersectionObserver reveal-on-scroll)
-    shared/                  SectionHeading, TechIcon
-    pages/                   header, hero, about, experience, skills, projects, contact, footer, home
+                             NavigationService (in-page scroll — never touches the URL)
+    directives/              HomeZoomDirective (scroll-driven, pointer-anchored zoom out of Home),
+                             RevealDirective (IntersectionObserver reveal-on-scroll),
+                             CountUpDirective (stat tiles count up when they scroll into view)
+    shared/                  SectionHeading (self-revealing), TechIcon, EmptyState, ThemeToggle
+                             (floating light/dark switch), AmbientBackground (animated backdrop),
+                             load-state.ts (loading / ready / error wrapper for async content)
+    pages/                   hero, about, experience, skills, projects, contact, footer, home
   assets/
     data/portfolio.json      Skills and Projects content (see PortfolioDataService)
     fonts/                   Inter Variable (latin), self-hosted
@@ -70,12 +80,44 @@ Everything visible on the site is data, not markup:
 - **Experience** — `src/app/data/experience.data.ts`. The timeline section and its navigation link
   appear automatically once the array has entries.
 
+## Design language
+
+Every section is built from the same shared pieces, so new UI should reuse them rather than
+restyle locally:
+
+- **Glass surfaces** — `p-card`, chips, form fields, dialog and toast are translucent, blurred
+  over the ambient backdrop (`glass-surface` mixin / `--surface-card`). Cards marked `hover-lift`
+  lift, glow and light up a gradient hairline over their border.
+- **Gradient accents** — `--gradient-brand` drives eyebrow rules, `.gradient-text`, icon-tile
+  hover fills, section hairlines and the contact form's top edge.
+- **Motion** — leaving the Home page is a scroll-driven zoom (`appHomeZoom` on the hero
+  section): scroll position maps to a 0–1 progress over `--home-zoom-distance` of the hero's
+  height, the hero zooms towards the mouse pointer up to `--home-zoom-max` (accelerating) and
+  fades out over the last part while the next section slides in beneath it; scrolling back
+  scrubs it in reverse. Touch devices zoom from the viewport centre. Leaving Home via a link is
+  cinematic too: `NavigationService` holds the destination zoomed out and hidden while the page
+  scrolls, then zooms it into the viewport once the scroll settles (`page-enter-pending` /
+  `page-enter`). Every other section scrolls normally. Inside a section,
+  elements reveal on scroll (`appReveal`, staggered with `revealStagger`) in hierarchy order via
+  `revealDelay` — heading first, body groups next, their items after (the delay is the inherited
+  `--reveal-delay`). The page lands with a fade while the hero enters once (`.enter`), decorative
+  pieces drift (`.float`), the scroll cue and current-role marker pulse, and async content shows
+  skeletons (`p-skeleton`) or an `<app-empty-state>`. Real route changes (there is only one route
+  today) animate only from or to the Home route — it recedes or zooms back in via the Router's
+  view transitions; other route changes skip the transition. Everything is disabled or instant
+  under `prefers-reduced-motion`.
+
 ## Theme
 
 `ThemeService` follows the OS colour scheme until the visitor toggles it (persisted in
 `localStorage` under `portfolio-theme`). The `.app-dark` class on `<html>` switches both the
 design tokens and PrimeNG's dark scheme; `index.html` applies it before first paint to avoid a
 flash.
+
+The toggle is the floating button in the top-right corner (`shared/theme-toggle`). Switching
+animates a circular reveal of the new scheme out from the button (View Transitions API) and falls
+back to a colour cross-fade where that is unsupported; both are skipped under
+`prefers-reduced-motion`, as is the drifting of the ambient backdrop (`shared/ambient-background`).
 
 ## Deployment (Netlify or any static host)
 

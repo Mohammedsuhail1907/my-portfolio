@@ -27,8 +27,6 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
-  // Keeps anchored sections clear of the fixed header for scrollIntoView / :target scrolling.
-  scroll-padding-top: calc(var(--header-h) + 1rem);
 }
 
 body {
@@ -188,4 +186,43 @@ ol[role='list'] {
 
 .text-muted {
   color: var(--text-muted);
+}
+
+// Brand gradient clipped to the glyphs (hero role, stat values).
+.gradient-text {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+// Icon tile: soft gradient at rest; when its `.hover-lift` card is hovered the brand gradient
+// fades in behind the glyph. Size with `--tile-size` on the element.
+.icon-tile {
+  @include icon-tile(var(--tile-size, 2.75rem));
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--gradient-brand);
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-standard);
+  }
+}
+
+@include can-hover {
+  .hover-lift:hover .icon-tile {
+    color: var(--text-inverse);
+    transform: scale(1.06);
+    box-shadow: var(--glow-brand);
+
+    &::before {
+      opacity: 1;
+    }
+  }
 }

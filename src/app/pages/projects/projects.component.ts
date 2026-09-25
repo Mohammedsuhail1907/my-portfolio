@@ -5,14 +5,22 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
 import { Project } from '../../models/portfolio-data.model';
 import { RevealDirective } from '../../directives/reveal.directive';
 import { PortfolioDataService } from '../../services/portfolio-data.service';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import { toLoadState } from '../../shared/load-state';
 import { SectionHeadingComponent } from '../../shared/section-heading/section-heading.component';
 
+/** Placeholder cards shown while the projects load. */
+const SKELETON_CARDS = [0, 1, 2];
+
 /**
- * Projects section: a category filter, a responsive card grid and a detail dialog.
+ * Projects section: a category filter, a responsive card grid and a detail dialog. Skeleton
+ * cards hold the layout while the data loads; a failed load or an empty filter shows an empty
+ * state.
  *
  * Content comes from `PortfolioDataService` (currently backed by `assets/data/portfolio.json`,
  * still holding clearly-marked **placeholder** sample data — see that file). Optional fields
@@ -27,8 +35,10 @@ import { SectionHeadingComponent } from '../../shared/section-heading/section-he
     CardModule,
     DialogModule,
     SelectButtonModule,
+    SkeletonModule,
     TagModule,
     SectionHeadingComponent,
+    EmptyStateComponent,
     RevealDirective,
   ],
   templateUrl: './projects.component.html',
@@ -41,8 +51,14 @@ export class ProjectsComponent {
   protected readonly categories = toSignal(this.portfolioData.getProjectCategories(), {
     initialValue: [] as string[],
   });
-  protected readonly projects = toSignal(this.portfolioData.getProjects(), {
-    initialValue: [] as Project[],
+  private readonly state = toSignal(toLoadState(this.portfolioData.getProjects()), {
+    requireSync: true,
+  });
+
+  protected readonly status = computed(() => this.state().status);
+  protected readonly projects = computed<Project[]>(() => {
+    const state = this.state();
+    return state.status === 'ready' ? state.value : [];
   });
 
   protected readonly activeFilter = signal<string>('All');
@@ -54,6 +70,8 @@ export class ProjectsComponent {
 
   protected readonly selected = signal<Project | null>(null);
   protected readonly dialogOpen = signal(false);
+
+  protected readonly skeletonCards = SKELETON_CARDS;
 
   /** The card button that opened the dialog; focus returns to it when the dialog closes. */
   private trigger: HTMLElement | null = null;

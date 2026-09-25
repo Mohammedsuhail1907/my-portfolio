@@ -3,7 +3,7 @@
     <app-section-heading eyebrow="About" title="About Me" titleId="about-title" />
 
     <div class="section__body grid-2">
-      <div class="about__intro" appReveal>
+      <div class="about__intro" appReveal="left" [revealDelay]="120">
         <p class="lead about__lead">{{ intro.lead }}</p>
         @for (paragraph of intro.paragraphs; track paragraph) {
           <p class="about__paragraph">{{ paragraph }}</p>
@@ -11,9 +11,9 @@
 
         <ul class="about__stats" role="list" appReveal revealStagger>
           @for (stat of stats; track stat.label) {
-            <li class="reveal-item" [style.--i]="$index">
-              <p-card styleClass="about__stat">
-                <span class="about__stat-value">{{ stat.value }}</span>
+            <li class="reveal-item reveal-item--scale" [style.--i]="$index">
+              <p-card class="about__stat">
+                <span class="about__stat-value gradient-text" [appCountUp]="stat.value"></span>
                 <span class="about__stat-label">{{ stat.label }}</span>
               </p-card>
             </li>
@@ -21,15 +21,15 @@
         </ul>
       </div>
 
-      <div class="about__services" appReveal>
+      <div class="about__services" appReveal="right" [revealDelay]="200">
         <h3 class="about__subtitle">What I Do</h3>
 
         <ul class="stack" role="list" appReveal revealStagger>
           @for (service of services; track service.title) {
-            <li class="reveal-item" [style.--i]="$index">
-              <p-card styleClass="about__service hover-lift">
+            <li class="reveal-item reveal-item--right" [style.--i]="$index">
+              <p-card class="about__service hover-lift">
                 <div class="about__service-body">
-                  <span class="about__service-icon">
+                  <span class="icon-tile about__service-icon">
                     <i [class]="service.icon" aria-hidden="true"></i>
                   </span>
                   <div class="about__service-text">

@@ -23,8 +23,8 @@ export const SITE = {
   role: 'Full Stack Developer',
   greeting: "Hello, I'm",
   tagline:
-    'I create beautiful, responsive web applications with modern technologies. Passionate about clean code, user experience, and innovative solutions.',
-  footerTagline: 'Full Stack Developer passionate about creating amazing digital experiences.',
+    'I turn ideas into fast, elegant web and mobile experiences — built on clean code, thoughtful design, and technology that simply works.',
+  footerTagline: 'Crafting fast, elegant digital experiences — built to last.',
   email: 'Mohammedsuhail1907@gmail.com',
   phone: '+91 9003887006',
   phoneHref: 'tel:+919003887006',
@@ -68,6 +68,7 @@ const ALL_SECTIONS: (SectionDef & { enabled: () => boolean })[] = [
   { id: 'about', label: 'About', enabled: () => true },
   { id: 'experience', label: 'Experience', enabled: () => EXPERIENCE.length > 0 },
   { id: 'skills', label: 'Skills', enabled: () => true },
+  { id: 'services', label: 'Services', enabled: () => true },
   { id: 'projects', label: 'Projects', enabled: () => SITE.features.projects },
   { id: 'contact', label: 'Contact', enabled: () => true },
 ];

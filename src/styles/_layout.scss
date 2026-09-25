@@ -8,30 +8,45 @@
   padding-inline: var(--container-pad);
 }
 
+// Page gutter and the inset of fixed controls (theme toggle, scroll-to-top) grow together.
 @include up(sm) {
   :root {
     --container-pad: 1.5rem;
+    --floating-inset: 1.25rem;
   }
 }
 
 @include up(lg) {
   :root {
     --container-pad: 2rem;
+    --floating-inset: 1.5rem;
   }
 }
 
 .section {
   position: relative;
   padding-block: var(--section-py);
-  scroll-margin-top: var(--header-h);
 }
 
 .section--alt {
   background: var(--surface-alt);
 }
 
-.section--bordered {
-  border-top: 1px solid var(--border-color);
+// Hairline between sections that fades out towards the edges.
+.section--bordered::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-strong) 20%,
+    var(--border-strong) 80%,
+    transparent
+  );
+  pointer-events: none;
 }
 
 .section__body {
@@ -72,12 +87,4 @@
 
 .site-main {
   flex: 1 0 auto;
-}
-
-// The header is fixed. The home page's hero pads for it itself; components rendered by the
-// standalone section routes (/about, /skills, /contact) are pushed below it here. This lives in
-// the global stylesheet because routed components are outside AppComponent's style scope.
-.site-main > :not(router-outlet, app-home) {
-  display: block;
-  padding-top: var(--header-h);
 }
