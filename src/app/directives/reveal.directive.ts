@@ -23,9 +23,10 @@ export const REVEAL_REPLAY_EVENT = 'app-reveal-replay';
 /**
  * How far past the viewport (top and bottom) the host must FULLY leave before its reveal
  * re-arms. The margin is what keeps small back-and-forth scrolling from ever replaying an
- * entrance — only genuinely scrolling away and coming back does.
+ * entrance — only genuinely scrolling away and coming back does. Shared with CountUpDirective,
+ * whose count re-arms in step with the tile around it.
  */
-const REARM_MARGIN = '25% 0px 25% 0px';
+export const REVEAL_REARM_MARGIN = '25% 0px 25% 0px';
 
 /**
  * Reveals the host when it enters the viewport (IntersectionObserver), by toggling `is-visible`.
@@ -84,9 +85,12 @@ export class RevealDirective implements OnInit, OnDestroy {
     }
 
     const element = this.host.nativeElement;
+    // Each observer watches exactly one element, so a batched delivery is a time series and
+    // only its LAST entry is current — a janky frame delivering [out, in] must not hide an
+    // element that ended up back on screen.
     this.showObserver = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
+        if (entries[entries.length - 1].isIntersecting) {
           this.visible.set(true);
         }
       },
@@ -96,11 +100,11 @@ export class RevealDirective implements OnInit, OnDestroy {
     // the padded viewport, which can never overlap with the show observer's "entered".
     this.rearmObserver = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => !entry.isIntersecting)) {
+        if (!entries[entries.length - 1].isIntersecting) {
           this.visible.set(false);
         }
       },
-      { rootMargin: REARM_MARGIN },
+      { rootMargin: REVEAL_REARM_MARGIN },
     );
     this.showObserver.observe(element);
     this.rearmObserver.observe(element);

@@ -1,0 +1,45 @@
+@use 'mixins' as *;
+
+:host {
+  display: block;
+}
+
+// Offer grid: the shared auto-fill rhythm below lg, a fixed 2 × 3 from lg up so the six cards
+// always land as two even rows.
+.services-grid {
+  gap: var(--space-5);
+
+  @include up(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.services-grid__item {
+  display: flex;
+}
+
+.service-card {
+  width: 100%;
+}
+
+// Tile chrome comes from the global .icon-tile; the glow/gradient on hover comes from the
+// global `.hover-lift:hover .icon-tile` interaction.
+.service-card__icon {
+  --tile-size: 3rem;
+
+  margin-bottom: var(--space-5);
+
+  > i {
+    font-size: var(--fs-h3);
+  }
+}
+
+.service-card__title {
+  margin-bottom: var(--space-2);
+  font-size: var(--fs-h4);
+}
+
+.service-card__desc {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+}

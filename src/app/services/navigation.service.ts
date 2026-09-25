@@ -103,6 +103,14 @@ export class NavigationService {
       // The section's reveals already fired (invisibly) while the page scrolled by, so replay
       // them now: its components cascade in with the entrance instead of standing revealed.
       window.dispatchEvent(new CustomEvent(REVEAL_REPLAY_EVENT, { detail: { root: section } }));
+      // Arriving at the LAST section puts the footer in the same viewport; it lives outside the
+      // sections, so it gets its own replay to join the cascade instead of standing revealed.
+      if (this.items[this.items.length - 1]?.id === section.id) {
+        const footer = this.document.querySelector<HTMLElement>('.site-footer');
+        if (footer) {
+          window.dispatchEvent(new CustomEvent(REVEAL_REPLAY_EVENT, { detail: { root: footer } }));
+        }
+      }
     };
 
     timer = setTimeout(arrive, SCROLL_SETTLE_MS);
