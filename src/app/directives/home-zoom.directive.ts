@@ -4,6 +4,8 @@ import { AfterViewInit, DestroyRef, Directive, ElementRef, NgZone, inject } from
 const DEFAULT_MAX_SCALE = 1.6;
 /** Progress at which the page starts fading out; it is gone at 1. */
 const FADE_FROM = 0.55;
+/** Opacity below which the page counts as gone: it leaves hit-testing and the tab order. */
+const FADE_GONE = 0.05;
 /** Per-frame share of the remaining distance the zoom origin moves towards the pointer. */
 const ORIGIN_FOLLOW = 0.15;
 /** Origin movement (px) below which the follow is considered settled. */
@@ -42,10 +44,12 @@ const smoothstep = (t: number): number => {
  * follows the pointer with a short lerp (jumping it while scaled would shift the content). Touch
  * devices, or no pointer yet, zoom from the centre of the viewport.
  *
- * Only `transform`, `opacity` and `visibility` change (the last so the invisible, fully-zoomed
- * page can't be clicked or tabbed into while the next section arrives), written once per
- * animation frame from passive listeners registered outside Angular's zone; the frame loop stops
- * as soon as there is nothing left to settle. Inert under `prefers-reduced-motion` — the stage is
+ * Only `transform`, `opacity` and `visibility` change (the last as soon as the fade makes the
+ * page imperceptible, so nothing invisible is ever clickable or tabbable), written once per
+ * animation frame from passive listeners registered outside Angular's zone. The frame loop stops
+ * as soon as there is nothing left to settle, and below the runway the whole effect parks: no
+ * origin work, no layer hint, and pointer movement never wakes it. Inert under
+ * `prefers-reduced-motion` — the stage is
  * never armed, so the page stays in normal flow with no dead scroll distance — and it disarms
  * itself if the preference flips mid-visit.
  */
@@ -79,6 +83,8 @@ export class HomeZoomDirective implements AfterViewInit {
 
   private frame = 0;
   private zooming = false;
+  /** True once the zoom is spent (progress 1) and the page sits parked, hidden, below the pin. */
+  private parked = false;
 
   ngAfterViewInit(): void {
     const stage = this.host.nativeElement;
@@ -150,44 +156,61 @@ export class HomeZoomDirective implements AfterViewInit {
       return;
     }
 
-    // Both rects are plain layout geometry: the stage never pins nor transforms, and of the
-    // section only its .container child is transformed.
+    // The stage rect is plain layout geometry: the stage never pins nor transforms.
     const scrolled = -stage.getBoundingClientRect().top;
     const progress = clamp01((scrolled - this.pinOffset) / this.runway);
-    const sectionRect = section.getBoundingClientRect();
 
-    // Zoom origin: the pointer (or the viewport centre) in the container's own coordinates.
-    const pointerX = Number.isNaN(this.pointerX) ? window.innerWidth / 2 : this.pointerX;
-    const pointerY = Number.isNaN(this.pointerY) ? window.innerHeight / 2 : this.pointerY;
-    const targetX = pointerX - (sectionRect.left + this.containerLeft);
-    const targetY = pointerY - (sectionRect.top + this.containerTop);
-    if (!this.originSet || progress === 0) {
-      // At scale 1 the origin is invisible, so it can snap to the pointer freely.
-      this.originX = targetX;
-      this.originY = targetY;
-      this.originSet = true;
-    } else {
-      this.originX += (targetX - this.originX) * ORIGIN_FOLLOW;
-      this.originY += (targetY - this.originY) * ORIGIN_FOLLOW;
+    // Zoom spent and the visitor is somewhere below: the page is parked (hidden and static), so
+    // there is nothing to update from tick to tick — and with `zooming` false down there,
+    // pointer moves never even schedule a frame. Scroll ticks still reach this far, so the
+    // first scrub back re-enters the live path.
+    const parked = progress >= 1;
+    if (parked && this.parked) {
+      return;
+    }
+    this.parked = parked;
+
+    // The origin follows the pointer only while the zoom is live: while parked the section sits
+    // unpinned way offscreen, and lerping towards targets measured there would corrupt the
+    // origin the next zoom-out starts from.
+    let originSettled = true;
+    if (!parked) {
+      // The section rect is untransformed layout too — only its .container child scales.
+      const sectionRect = section.getBoundingClientRect();
+      // Zoom origin: the pointer (or the viewport centre) in the container's own coordinates.
+      const pointerX = Number.isNaN(this.pointerX) ? window.innerWidth / 2 : this.pointerX;
+      const pointerY = Number.isNaN(this.pointerY) ? window.innerHeight / 2 : this.pointerY;
+      const targetX = pointerX - (sectionRect.left + this.containerLeft);
+      const targetY = pointerY - (sectionRect.top + this.containerTop);
+      if (!this.originSet || progress === 0) {
+        // At scale 1 the origin is invisible, so it can snap to the pointer freely.
+        this.originX = targetX;
+        this.originY = targetY;
+        this.originSet = true;
+      } else {
+        this.originX += (targetX - this.originX) * ORIGIN_FOLLOW;
+        this.originY += (targetY - this.originY) * ORIGIN_FOLLOW;
+      }
+      container.style.transformOrigin = `${this.originX.toFixed(1)}px ${this.originY.toFixed(1)}px`;
+      originSettled =
+        Math.abs(targetX - this.originX) < ORIGIN_SETTLED &&
+        Math.abs(targetY - this.originY) < ORIGIN_SETTLED;
     }
 
     const scale = 1 + progress * progress * (this.maxScale - 1);
     const opacity = 1 - smoothstep((progress - FADE_FROM) / (1 - FADE_FROM));
 
-    container.style.transformOrigin = `${this.originX.toFixed(1)}px ${this.originY.toFixed(1)}px`;
     container.style.transform = progress === 0 ? '' : `scale(${scale.toFixed(4)})`;
     section.style.opacity = progress === 0 ? '' : opacity.toFixed(3);
-    // Fully zoomed, the page is invisible but still pinned beneath the arriving next section:
-    // keep it out of hit-testing and the tab order until the visitor scrolls back.
-    section.style.visibility = progress >= 1 ? 'hidden' : '';
-    this.zooming = progress > 0;
+    // Interactivity is tied to the fade, not to progress 1: as soon as the page is imperceptible
+    // it also leaves hit-testing and the tab order (and returns the same way when scrubbed back),
+    // so nothing invisible is ever clickable or focusable.
+    section.style.visibility = opacity < FADE_GONE ? 'hidden' : '';
+    this.zooming = progress > 0 && !parked;
     stage.classList.toggle('is-zooming', this.zooming);
 
     // Keep going only while the origin is still catching up with the pointer.
-    const settled =
-      Math.abs(targetX - this.originX) < ORIGIN_SETTLED &&
-      Math.abs(targetY - this.originY) < ORIGIN_SETTLED;
-    if (this.zooming && !settled) {
+    if (this.zooming && !originSettled) {
       this.schedule();
     }
   };

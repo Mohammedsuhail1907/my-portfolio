@@ -21,6 +21,14 @@ import { ThemeToggleComponent } from './shared/theme-toggle/theme-toggle.compone
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
+  /**
+   * The scroll-to-top button should not appear while the visitor is still inside the Home
+   * page's pinned zoom runway (~1.75 viewport-heights of scroll during which the page LOOKS
+   * like the top of the site) — only once the next section is well in view.
+   */
+  protected readonly scrollTopThreshold =
+    typeof window === 'undefined' ? 600 : Math.round(window.innerHeight * 2.25);
+
   constructor() {
     // Instantiate eagerly so the persisted/system theme is applied as soon as the app boots.
     inject(ThemeService);

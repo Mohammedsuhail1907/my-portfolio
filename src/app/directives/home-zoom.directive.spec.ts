@@ -100,12 +100,19 @@ describe('HomeZoomDirective', () => {
       expect(Number(section.style.opacity)).toBe(1);
       expect(section.style.visibility).toBe('');
 
-      // Past the runway: maximum scale, faded out, and untouchable while the next content
-      // scrolls in over it.
+      // Late in the runway the fade has made the page imperceptible: it must already be out of
+      // hit-testing and the tab order, while the zoom itself is still live.
+      await scrollAndSettle(stageTop + runway * 0.96);
+      expect(section.style.visibility).toBe('hidden');
+      expect(stage.classList.contains('is-zooming')).toBeTrue();
+
+      // Past the runway: maximum scale, faded out, untouchable, and parked — the effect idles
+      // (no layer hint) while the visitor browses the rest of the page.
       await scrollAndSettle(stageTop + runway + 50);
       expect(scaleOf(container)).toBeCloseTo(1.6, 3);
       expect(Number(section.style.opacity)).toBe(0);
       expect(section.style.visibility).toBe('hidden');
+      expect(stage.classList.contains('is-zooming')).toBeFalse();
 
       // Back to the top: fully reversed.
       await scrollAndSettle(0);
