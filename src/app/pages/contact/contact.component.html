@@ -155,13 +155,17 @@
           </div>
 
           <div class="contact-form__actions">
-            <p-button
+            <!-- pButton on a native button (as in the hero), not <p-button>: the component writes
+                 autofocus="true" into the DOM, which the browser honours in the pre-rendered
+                 HTML and scrolls the page down here on load. -->
+            <button
               type="submit"
+              pButton
               label="Send Message"
               icon="pi pi-send"
               iconPos="right"
               [loading]="sending()"
-            />
+            ></button>
           </div>
         </form>
       </p-card>

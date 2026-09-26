@@ -112,11 +112,15 @@ export class RevealDirective implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // The replay listener exists only when the observers do (never under reduced motion, never
+    // in the build-time prerender, which has no `window` at all).
+    if (this.showObserver) {
+      window.removeEventListener(REVEAL_REPLAY_EVENT, this.onReplay);
+    }
     this.showObserver?.disconnect();
     this.rearmObserver?.disconnect();
     this.showObserver = null;
     this.rearmObserver = null;
-    window.removeEventListener(REVEAL_REPLAY_EVENT, this.onReplay);
   }
 
   /** Replays this reveal when the event's root contains the host (and motion is allowed). */

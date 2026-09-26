@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  afterNextRender,
   computed,
   inject,
   input,
@@ -61,16 +62,21 @@ export class ExperienceComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
-    if (typeof matchMedia !== 'function') {
-      return;
-    }
-    const query = matchMedia(LG_QUERY);
-    const update = (state: { matches: boolean }): void => {
-      this.align.set(state.matches ? 'alternate' : 'left');
-    };
-    update(query);
-    query.addEventListener('change', update);
-    this.destroyRef.onDestroy(() => query.removeEventListener('change', update));
+    // The viewport is only known in the browser, and the DOM may only differ from the
+    // pre-rendered HTML (always the 'left' layout) after hydration — so the first render matches
+    // the server's, and the alignment flips right after, before the section is on screen.
+    afterNextRender(() => {
+      if (typeof matchMedia !== 'function') {
+        return;
+      }
+      const query = matchMedia(LG_QUERY);
+      const update = (state: { matches: boolean }): void => {
+        this.align.set(state.matches ? 'alternate' : 'left');
+      };
+      update(query);
+      query.addEventListener('change', update);
+      this.destroyRef.onDestroy(() => query.removeEventListener('change', update));
+    });
   }
 
   /** 'Jun 2024 — Present' for a current role, 'Jan 2023 — May 2024' for a finished one. */
