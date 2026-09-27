@@ -3,16 +3,25 @@ import { SITE } from '../../config/site.config';
 import { RevealDirective } from '../../directives/reveal.directive';
 import { NavigationService } from '../../services/navigation.service';
 
-/** Services listed in the footer, carried over verbatim from the original template. */
-const FOOTER_SERVICES: readonly string[] = [
-  'Web Development',
-  'Web Application Development',
-  'Mobile Apps',
+/** A service listed in the footer: the label (carried over verbatim) with a PrimeIcons glyph. */
+interface FooterService {
+  label: string;
+  icon: string;
+}
+
+const FOOTER_SERVICES: readonly FooterService[] = [
+  { label: 'Web Development', icon: 'pi pi-globe' },
+  { label: 'Web Application Development', icon: 'pi pi-code' },
+  { label: 'Mobile Apps', icon: 'pi pi-mobile' },
 ];
 
 /**
- * Site footer. The "Quick Links" scroll within the page via `NavigationService.scrollTo` (plain
- * buttons, no URL change); the "Connect" links are real external hyperlinks and stay as `<a>`.
+ * Site footer: brand block, the section links, the services and a compact copyright bar.
+ * Contact details and social profiles live in the Contact section (and the hero), not here.
+ *
+ * Below the lg breakpoint the groups are compact glass cards; from lg up they open out into
+ * columns. The "Quick Links" scroll within the page via `NavigationService.scrollTo` (plain
+ * buttons, no URL change).
  */
 @Component({
   selector: 'app-footer',
