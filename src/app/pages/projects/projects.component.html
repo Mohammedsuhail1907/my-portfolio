@@ -84,12 +84,15 @@
 
                   <ng-template #footer>
                     <div class="cluster project-card__actions">
-                      <p-button
+                      <!-- pButton on native buttons, not <p-button>: see contact.component.html. -->
+                      <button
+                        type="button"
+                        pButton
                         label="Details"
                         icon="pi pi-eye"
                         [text]="true"
-                        (onClick)="open(project, $event)"
-                      />
+                        (click)="open(project, $event)"
+                      ></button>
                       @if (project.demoUrl) {
                         <a
                           pButton
@@ -201,12 +204,14 @@
 
     <ng-template #footer>
       <div class="project-dialog__actions">
-        <p-button
+        <button
+          type="button"
+          pButton
           label="Close"
           severity="secondary"
           [text]="true"
-          (onClick)="close()"
-        />
+          (click)="close()"
+        ></button>
         @if (selected(); as project) {
           @if (project.githubUrl) {
             <a

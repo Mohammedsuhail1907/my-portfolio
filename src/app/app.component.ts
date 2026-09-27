@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, PLATFORM_ID, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ScrollTop } from 'primeng/scrolltop';
 import { Toast } from 'primeng/toast';
@@ -36,8 +37,9 @@ export class AppComponent {
     // This is a single-page portfolio: section navigation scrolls in place and never touches the
     // URL (see NavigationService.scrollTo). Clean up a leftover #fragment from an old bookmark or
     // shared link so the address bar always shows just the origin. replaceState neither creates a
-    // history entry nor triggers navigation.
-    if (location.hash) {
+    // history entry nor triggers navigation. Browser only: the build-time prerender has no
+    // `location` (and nothing to clean up).
+    if (isPlatformBrowser(inject(PLATFORM_ID)) && location.hash) {
       history.replaceState(null, '', location.pathname + location.search);
     }
   }

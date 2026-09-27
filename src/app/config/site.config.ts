@@ -30,10 +30,22 @@ export const SITE = {
   phoneHref: 'tel:+919003887006',
   location: 'Chennai, Tamil Nadu',
   /**
-   * Deployed origin without a trailing slash, e.g. 'https://mohammedsuhail.netlify.app'.
-   * Leave empty until known; it only powers absolute URLs (canonical / og:url) in index.html.
+   * Public origin of the deployed site, no trailing slash (e.g. 'https://example.com'). It is
+   * the base of every absolute URL baked into the pre-rendered HTML — canonical, og:url,
+   * og:image, JSON-LD — and of the generated sitemap.xml / robots.txt. Leave empty to resolve it
+   * at build time from the environment instead (`SITE_URL`, or Vercel's
+   * `VERCEL_PROJECT_PRODUCTION_URL` — see app/seo/site-url.server.ts).
    */
   siteUrl: '',
+  /** Search / social defaults (see app/seo); a route overrides them through its `seo` data. */
+  seo: {
+    description:
+      'Mohammed Suhail is a full stack developer in Chennai, Tamil Nadu, building responsive, scalable web applications with Angular, TypeScript and .NET.',
+    /** Open Graph locale. */
+    locale: 'en_IN',
+    /** Topics listed on the Person in the structured data (`knowsAbout`). */
+    knowsAbout: ['Angular', 'TypeScript', 'JavaScript', 'C#', '.NET', 'SQL'],
+  },
   portrait: {
     src: 'assets/images/portrait.jpg',
     width: 800,

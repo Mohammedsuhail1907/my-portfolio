@@ -4,15 +4,37 @@
   display: block;
 }
 
+// Layout in one glance
+//   < sm  : one column — brand (name, tagline, "Back to top"), link tiles, services, copyright;
+//           the two groups are glass cards under small captions.
+//   sm–lg : brand full width, then links | services side by side.
+//   ≥ lg  : brand on the left, the two groups as open columns hugging the right — no cards.
+// DOM order is the visual order at every width (the grid auto-places, only the spans change), so
+// tab and reading order never jump columns.
+// The app's floating scroll-to-top button sits over the bottom-right corner whenever the footer
+// is in view, so the copyright bar is aligned with it and keeps clear of it.
+
 .site-footer {
-  // The footer is dark in both colour schemes, so these local values are literal on purpose.
+  // The footer is dark in both colour schemes, so these local values are literal on purpose
+  // (`--brand` is blue-600 in the light scheme, too dim on slate-900; blue-300 is the accent).
   --footer-fg-strong: #f8fafc;
   --footer-border: rgba(148, 163, 184, 0.18);
   --footer-glass: rgba(255, 255, 255, 0.04);
+  --footer-glass-hover: rgba(255, 255, 255, 0.07);
+  --footer-glass-active: rgba(255, 255, 255, 0.11);
+  --focus-ring: #93c5fd;
+  // Size of the round controls: the rows here and the app's floating scroll-to-top button.
+  --footer-control: 2.75rem;
+  // One transition list shared by every interactive part.
+  --footer-transition:
+    color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard),
+    opacity var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-out);
 
   position: relative;
   overflow: hidden;
-  padding-block: var(--space-16) var(--space-8);
+  padding-block: var(--space-10) var(--floating-inset);
   background: var(--surface-footer);
   color: var(--text-on-footer);
 
@@ -25,10 +47,10 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--brand) 30%, var(--accent) 70%, transparent);
     opacity: 0.7;
-    pointer-events: none;
   }
 
-  // Soft brand glow in the lower-left corner.
+  // Soft brand glow in the lower-left corner. It paints above the content (later in tree order),
+  // so it must let clicks and hovers through.
   &::after {
     content: '';
     position: absolute;
@@ -46,137 +68,319 @@
   }
 }
 
-// Top grid: intro + link columns ----------------------------------------------------------------
+// Groups grid ----------------------------------------------------------------------------------
 .site-footer__grid {
   display: grid;
-  gap: var(--space-10);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
 
-  @include up(md) {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr);
-    gap: var(--space-16);
+.site-footer__bottom {
+  grid-column: 1 / -1;
+}
+
+// Brand block ----------------------------------------------------------------------------------
+.site-footer__brand-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+
+  // Phones: keep the tagline out of the fixed theme toggle's lane in the top-right corner.
+  @include down(sm) {
+    padding-right: calc(var(--footer-control) + var(--space-3));
   }
 }
 
 .site-footer__brand {
   font-size: var(--fs-h3);
   font-weight: 700;
+  line-height: var(--lh-snug);
   letter-spacing: var(--tracking-tight);
   color: var(--footer-fg-strong);
 }
 
 .site-footer__tagline {
-  max-width: 24rem;
-  margin-top: var(--space-3);
-  color: var(--text-on-footer-muted);
-}
-
-.site-footer__columns {
-  display: grid;
-  gap: var(--space-8);
-
-  @include up(sm) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.site-footer__title {
-  margin-bottom: var(--space-4);
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--footer-fg-strong);
-}
-
-.site-footer__list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.site-footer__link,
-.site-footer__text {
-  display: inline-flex;
-  align-items: center;
-  padding-block: var(--space-1);
+  max-width: 22rem;
+  margin-top: 0;
   font-size: var(--fs-sm);
   color: var(--text-on-footer-muted);
 }
 
-.site-footer__link {
-  transition:
-    color var(--dur-fast) var(--ease-standard),
-    transform var(--dur-base) var(--ease-out);
-
-  &:hover,
-  &:focus-visible {
-    color: var(--footer-fg-strong);
-    transform: translateX(3px);
-  }
-}
-
-// Bottom bar ------------------------------------------------------------------------------------
-.site-footer__bottom {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-12);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--footer-border);
-  text-align: center;
-
-  @include up(md) {
-    flex-direction: row;
-    justify-content: space-between;
-    text-align: left;
-  }
-}
-
-.site-footer__copyright {
-  font-size: var(--fs-sm);
-  color: var(--text-on-footer-muted);
-}
-
-// Glass pill.
+// Glass pill — on the left at every width, so it never meets the theme toggle or doubles up with
+// the floating scroll-to-top button.
 .site-footer__top {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 2.75rem;
+  min-height: var(--footer-control);
+  margin-top: var(--space-1);
   padding-inline: var(--space-4);
   border: 1px solid var(--footer-border);
   border-radius: var(--radius-full);
   background: var(--footer-glass);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
   font-size: var(--fs-sm);
   font-weight: 500;
   color: var(--text-on-footer);
-  transition:
-    color var(--dur-fast) var(--ease-standard),
-    border-color var(--dur-fast) var(--ease-standard),
-    background-color var(--dur-fast) var(--ease-standard),
-    transform var(--dur-base) var(--ease-out);
+  transition: var(--footer-transition);
 
   .pi {
     font-size: var(--fs-xs);
-    transition: transform var(--dur-base) var(--ease-out);
-  }
-
-  &:hover,
-  &:focus-visible {
-    color: var(--footer-fg-strong);
-    border-color: var(--text-on-footer-muted);
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-2px);
-
-    .pi {
-      transform: translateY(-2px);
-    }
   }
 
   &:active {
-    transform: translateY(0) scale(0.97);
+    background: var(--footer-glass-active);
+    transform: scale(0.96);
+  }
+}
+
+// Captions and cards ---------------------------------------------------------------------------
+.site-footer__title {
+  margin-bottom: var(--space-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--text-on-footer);
+}
+
+.site-footer__card {
+  overflow: clip;
+  border: 1px solid var(--footer-border);
+  border-radius: var(--radius-lg);
+  background: var(--footer-glass);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+// Hairlines between the service rows (the link tiles draw their own, below).
+.site-footer__list > * + * {
+  border-top: 1px solid var(--footer-border);
+}
+
+// Rows -----------------------------------------------------------------------------------------
+.site-footer__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--footer-control);
+  padding-inline: var(--space-3);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: var(--lh-snug);
+  color: var(--text-on-footer);
+}
+
+.site-footer__row-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.site-footer__row-trail {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 0.75rem;
+  opacity: 0.5;
+  transition: var(--footer-transition);
+}
+
+.site-footer__row--link {
+  cursor: pointer;
+  transition: var(--footer-transition);
+
+  // The ring sits inside the clipped card.
+  &:focus-visible {
+    outline-offset: -3px;
+  }
+
+  &:hover {
+    color: var(--footer-fg-strong);
+  }
+
+  &:active {
+    background: var(--footer-glass-active);
+    color: var(--footer-fg-strong);
+  }
+}
+
+// Icon tile in front of each service.
+.site-footer__tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+// Quick links: a two-column tile grid whose hairlines stay correct for any item count; an odd
+// last tile spans the full width.
+.site-footer__tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  > li:nth-child(even) {
+    border-left: 1px solid var(--footer-border);
+  }
+
+  > li:nth-child(n + 3) {
+    border-top: 1px solid var(--footer-border);
+  }
+
+  > li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+// Hover (pointers that can hover only, so touch never gets a stuck highlight) ---------------------
+@include can-hover {
+  .site-footer__top:hover {
+    color: var(--footer-fg-strong);
+    border-color: rgba(147, 197, 253, 0.45);
+    background: var(--footer-glass-hover);
+    transform: translateY(-2px);
+  }
+
+  .site-footer__row--link:hover {
+    background: var(--footer-glass-hover);
+
+    .site-footer__row-trail {
+      opacity: 1;
+      transform: translateX(2px);
+    }
+  }
+}
+
+// Bottom bar -----------------------------------------------------------------------------------
+// Aligned with the floating scroll-to-top button's axis (`--footer-control` tall, `--floating-inset`
+// from the bottom) and padded on the right so the copyright never runs under it.
+.site-footer__bottom {
+  display: flex;
+  align-items: center;
+  box-sizing: content-box;
+  min-height: var(--footer-control);
+  margin-top: var(--space-2);
+  padding-top: var(--space-4);
+  padding-right: calc(var(--footer-control) + var(--space-3));
+  border-top: 1px solid var(--footer-border);
+}
+
+.site-footer__copyright {
+  font-size: var(--fs-xs);
+  line-height: 1.4;
+  color: var(--text-on-footer-muted);
+}
+
+// Phones: a deliberate two-line copyright ("© year name." / "All rights reserved.") instead of a
+// browser-chosen break.
+.site-footer__rights {
+  display: block;
+}
+
+// Layout by breakpoint --------------------------------------------------------------------------
+@include up(sm) {
+  .site-footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5) var(--space-6);
+  }
+
+  .site-footer__rights {
+    display: inline;
+  }
+}
+
+// sm–lg: the brand spans both columns; links and services pair up beneath it.
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .site-footer__brand-block {
+    grid-column: 1 / -1;
+  }
+}
+
+@include up(md) {
+  .site-footer {
+    padding-top: var(--space-12);
+  }
+
+  .site-footer__grid {
+    gap: var(--space-6) var(--space-8);
+  }
+
+  .site-footer__row {
+    padding-inline: var(--space-4);
+  }
+
+  .site-footer__bottom {
+    margin-top: var(--space-4);
+  }
+}
+
+// Desktop: brand left, the two groups as open columns on the right; no card chrome.
+@include up(lg) {
+  .site-footer {
+    padding-top: var(--space-16);
+  }
+
+  .site-footer__grid {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: start;
+    column-gap: var(--space-12);
+  }
+
+  .site-footer__card {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .site-footer__tiles {
+    grid-template-columns: minmax(0, 1fr);
+
+    > li:nth-child(even),
+    > li:nth-child(n + 3) {
+      border: 0;
+    }
+
+    > li:last-child:nth-child(odd) {
+      grid-column: auto;
+    }
+  }
+
+  .site-footer__list > * + * {
+    border-top: 0;
+  }
+
+  // Open-column rows: shorter, and the hover highlight bleeds slightly past the text (the same
+  // device as the skill rows) instead of hugging it.
+  .site-footer__row {
+    min-height: 2.5rem;
+    margin-inline: calc(-1 * var(--space-2));
+    padding-inline: var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  .site-footer__row-trail {
+    display: none;
+  }
+
+  .site-footer__tile {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+@include up(xl) {
+  .site-footer__grid {
+    column-gap: var(--space-16);
+  }
+
+  .site-footer__tagline {
+    font-size: var(--fs-base);
   }
 }

@@ -1,8 +1,25 @@
 import { ActivatedRouteSnapshot, Routes } from '@angular/router';
 import { SITE } from './config/site.config';
+import { PageSeo } from './seo/seo.model';
+import { homeStructuredData } from './seo/structured-data';
 
 /** Path of the Home page — the site root. */
 export const HOME_PATH = '';
+
+/**
+ * Search / social contract of the Home page, applied on navigation by SeoTitleStrategy and
+ * baked into the pre-rendered HTML at build time (see app/seo). The portrait is a tall image,
+ * so the Twitter card stays `summary` (a square crop) rather than `summary_large_image`.
+ */
+const HOME_SEO: PageSeo = {
+  description: SITE.seo.description,
+  image: SITE.portrait.src,
+  imageAlt: SITE.portrait.alt,
+  imageWidth: SITE.portrait.width,
+  imageHeight: SITE.portrait.height,
+  twitterCard: 'summary',
+  jsonLd: homeStructuredData,
+};
 
 /**
  * A single route.
@@ -17,6 +34,7 @@ export const routes: Routes = [
   {
     path: HOME_PATH,
     title: `${SITE.name} — ${SITE.role}`,
+    data: { seo: HOME_SEO },
     loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
   },
   { path: '**', redirectTo: HOME_PATH },

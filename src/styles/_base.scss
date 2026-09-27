@@ -27,6 +27,14 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
+  // The page scrolls without a visible scrollbar, so the canvas runs edge to edge; wheel, keys,
+  // touch, the scroll cue and the scroll-to-top button all still scroll it as usual. Inner
+  // scroll areas (dialog, textarea) keep their own scrollbars.
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 body {

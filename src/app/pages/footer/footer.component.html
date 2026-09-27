@@ -1,67 +1,57 @@
 <footer class="site-footer">
   <div class="container">
-    <div class="site-footer__grid" appReveal="fade">
-      <div class="site-footer__intro">
+    <!-- One staggered reveal group; DOM order is the visual order at every width. -->
+    <div class="site-footer__grid" appReveal revealStagger>
+      <div class="site-footer__brand-block reveal-item" [style.--i]="0">
         <p class="site-footer__brand">{{ site.name }}</p>
         <p class="site-footer__tagline">{{ site.footerTagline }}</p>
+        <button type="button" class="site-footer__top" (click)="navigation.scrollTo('home')">
+          <i class="pi pi-arrow-up" aria-hidden="true"></i>
+          Back to top
+        </button>
       </div>
 
-      <div class="site-footer__columns">
-        <nav class="site-footer__col" aria-labelledby="footer-links-title">
-          <h3 id="footer-links-title" class="site-footer__title">Quick Links</h3>
-          <ul class="site-footer__list" role="list">
-            @for (link of links; track link.id) {
-              <li>
-                <button
-                  type="button"
-                  class="site-footer__link link-underline"
-                  (click)="navigation.scrollTo(link.id)"
-                >
-                  {{ link.label }}
-                </button>
-              </li>
-            }
-          </ul>
-        </nav>
-
-        <div class="site-footer__col">
-          <h3 class="site-footer__title">Services</h3>
-          <ul class="site-footer__list" role="list">
-            @for (service of services; track service) {
-              <li class="site-footer__text">{{ service }}</li>
-            }
-          </ul>
-        </div>
-
-        <nav class="site-footer__col" aria-labelledby="footer-connect-title">
-          <h3 id="footer-connect-title" class="site-footer__title">Connect</h3>
-          <ul class="site-footer__list" role="list">
-            @for (social of site.socials; track social.id) {
-              <li>
-                <a
-                  [href]="social.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="site-footer__link link-underline"
-                >
-                  {{ social.label }}
-                </a>
-              </li>
-            }
+      <!-- Section links: a two-column tile grid below lg, a plain column from lg. -->
+      <nav
+        class="site-footer__group site-footer__group--links reveal-item"
+        [style.--i]="1"
+        aria-labelledby="footer-links-title"
+      >
+        <h3 id="footer-links-title" class="site-footer__title">Quick Links</h3>
+        <ul class="site-footer__card site-footer__tiles" role="list">
+          @for (link of links; track link.id) {
             <li>
-              <a [href]="'mailto:' + site.email" class="site-footer__link link-underline">Email</a>
+              <button
+                type="button"
+                class="site-footer__row site-footer__row--link"
+                (click)="navigation.scrollTo(link.id)"
+              >
+                <span class="site-footer__row-text">{{ link.label }}</span>
+                <i class="pi pi-angle-right site-footer__row-trail" aria-hidden="true"></i>
+              </button>
             </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
+          }
+        </ul>
+      </nav>
 
-    <div class="site-footer__bottom">
-      <p class="site-footer__copyright">&copy; {{ year }} {{ site.name }}. All rights reserved.</p>
-      <button type="button" class="site-footer__top" (click)="navigation.scrollTo('home')">
-        <i class="pi pi-chevron-up" aria-hidden="true"></i>
-        Back to top
-      </button>
+      <div class="site-footer__group site-footer__group--services reveal-item" [style.--i]="2">
+        <h3 id="footer-services-title" class="site-footer__title">Services</h3>
+        <ul class="site-footer__card site-footer__list" role="list" aria-labelledby="footer-services-title">
+          @for (service of services; track service.label) {
+            <li class="site-footer__row">
+              <span class="site-footer__tile" aria-hidden="true"><i [class]="service.icon"></i></span>
+              <span class="site-footer__row-text">{{ service.label }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <div class="site-footer__bottom reveal-item" [style.--i]="3">
+        <p class="site-footer__copyright">
+          &copy; {{ year }} {{ site.name }}.
+          <span class="site-footer__rights">All rights reserved.</span>
+        </p>
+      </div>
     </div>
   </div>
 </footer>

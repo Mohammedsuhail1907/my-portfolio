@@ -4,6 +4,11 @@
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
+  // Reveals wait offset by up to 28px sideways (`.reveal--right` / `.reveal-item--right`); on
+  // full-width cards that pokes past the viewport edge and lets the page pan sideways on phones.
+  // Clipping here keeps every section inside the viewport. `clip` (not `hidden`) creates no
+  // scroll container, so the hero's sticky zoom pin is unaffected.
+  overflow-x: clip;
   // Landing: the page fades in while the hero's content staggers in (the `.enter` classes).
   // Opacity only — a transform here would become the containing block for fixed overlays.
   animation: page-land 600ms var(--ease-out) both;
