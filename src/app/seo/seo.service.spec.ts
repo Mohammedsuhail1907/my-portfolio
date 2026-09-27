@@ -6,7 +6,7 @@ import { SITE_URL } from './site-url.token';
 
 /** Every head tag the service may write, so each spec starts and ends with a clean head. */
 const OWNED_TAGS =
-  'meta[name="description"], meta[name="robots"], meta[property^="og:"], meta[name^="twitter:"], link[rel="canonical"], script[data-seo-jsonld]';
+  'meta[name="description"], meta[name="keywords"], meta[name="robots"], meta[property^="og:"], meta[name^="twitter:"], link[rel="canonical"], script[data-seo-jsonld]';
 
 describe('SeoService', () => {
   let doc: Document;
@@ -128,6 +128,32 @@ describe('SeoService', () => {
     });
     expect(scripts[1].textContent).not.toContain('<');
     expect(JSON.parse(scripts[1].textContent ?? '')['name']).toBe('</script><b>');
+  });
+
+  it('gives the social tags their own shorter description, leaving the search one long', () => {
+    const service = setup('https://example.com');
+
+    service.apply(
+      { title: 'Page', description: 'The long, informative one for search results.', socialDescription: 'The short one.' },
+      '/page',
+    );
+
+    expect(content('name="description"')).toBe('The long, informative one for search results.');
+    expect(content('property="og:description"')).toBe('The short one.');
+    expect(content('name="twitter:description"')).toBe('The short one.');
+  });
+
+  it('writes the keywords, defaulting to the site list and dropping the tag for an empty one', () => {
+    const service = setup('https://example.com');
+
+    service.apply({ title: 'Page' }, '/page');
+    expect(content('name="keywords"')).toBe(SITE.seo.keywords.join(', '));
+
+    service.apply({ title: 'Page', keywords: ['one', 'two'] }, '/page');
+    expect(contents('name="keywords"')).toEqual(['one, two']);
+
+    service.apply({ title: 'Page', keywords: [] }, '/page');
+    expect(content('name="keywords"')).toBeUndefined();
   });
 
   it('omits every absolute URL when the site URL is unknown, rather than emitting a relative one', () => {

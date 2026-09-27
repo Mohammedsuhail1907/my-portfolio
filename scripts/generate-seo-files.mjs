@@ -70,10 +70,23 @@ await writeFile(path.join(outDir, 'robots.txt'), robots.join('\n'));
 console.log(`✔ robots.txt${origin ? '' : ' (no Sitemap line: site URL unknown)'}`);
 
 if (urls.length) {
+  // `changefreq` and `priority` are advisory only — Google has said publicly that it ignores
+  // both — but they are part of the sitemaps.org schema and other crawlers still read them.
+  // The site root is the entry point, so it carries priority 1.0; anything else sits below it.
   const sitemap = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...urls.map((loc) => `  <url>\n    <loc>${escapeXml(loc)}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`),
+    ...urls.map((loc) => {
+      const isRoot = new URL(loc).pathname === '/';
+      return [
+        '  <url>',
+        `    <loc>${escapeXml(loc)}</loc>`,
+        `    <lastmod>${lastmod}</lastmod>`,
+        `    <changefreq>${isRoot ? 'weekly' : 'monthly'}</changefreq>`,
+        `    <priority>${isRoot ? '1.0' : '0.8'}</priority>`,
+        '  </url>',
+      ].join('\n');
+    }),
     '</urlset>',
     '',
   ].join('\n');

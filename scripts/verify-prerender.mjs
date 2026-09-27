@@ -12,6 +12,7 @@
 import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
+  PROJECT_ROOT,
   bodyText,
   browserOutputDir,
   canonicalHrefs,
@@ -191,6 +192,61 @@ for (const page of pages) {
   });
   console.log('');
 }
+
+// --- Static fallback head in src/index.html -----------------------------------------------------
+// src/index.html hard-codes the same title / description / Open Graph / Twitter tags, so a
+// response that never runs the app (index.csr.html, a JavaScript-less scraper) still carries the
+// contract. SeoService updates each tag in place, so the two must agree or the fallback ships
+// stale copy. Compared against the pre-rendered site root.
+console.log('static fallback head (src/index.html)');
+const rootPage = pages.find((page) => page.route === '/');
+if (!rootPage) {
+  report('warn', 'no pre-rendered site root to compare against');
+} else {
+  const staticHead = parseHead(await readFile(path.join(PROJECT_ROOT, 'src', 'index.html'), 'utf8'));
+  const renderedHead = parseHead(await readFile(rootPage.file, 'utf8'));
+  const compare = [
+    ['<title>', () => [staticHead.title], () => [renderedHead.title]],
+    ...[
+      ['name', 'description'],
+      ['name', 'keywords'],
+      ['name', 'robots'],
+      ['property', 'og:type'],
+      ['property', 'og:url'],
+      ['property', 'og:title'],
+      ['property', 'og:description'],
+      ['property', 'og:image'],
+      ['name', 'twitter:card'],
+      ['name', 'twitter:title'],
+      ['name', 'twitter:description'],
+      ['name', 'twitter:image'],
+    ].map(([attr, key]) => [key, () => metaContents(staticHead, attr, key), () => metaContents(renderedHead, attr, key)]),
+    ['canonical', () => canonicalHrefs(staticHead), () => canonicalHrefs(renderedHead)],
+  ];
+  let drifted = 0;
+  for (const [label, staticValues, renderedValues] of compare) {
+    const fallback = staticValues()[0] ?? '';
+    const rendered = renderedValues()[0] ?? '';
+    if (fallback !== rendered) {
+      drifted += 1;
+      report('warn', `${label} differs — src/index.html has ${JSON.stringify(fallback)}, rendered ${JSON.stringify(rendered)}`);
+    }
+  }
+  if (!drifted) {
+    report('ok', `${compare.length} fallback tag(s) match the rendered output`);
+  }
+  if (staticHead.jsonLd.length !== 1) {
+    report('warn', `expected exactly 1 JSON-LD block in src/index.html, found ${staticHead.jsonLd.length}`);
+  } else {
+    try {
+      JSON.parse(staticHead.jsonLd[0]);
+      report('ok', 'fallback JSON-LD is valid JSON');
+    } catch (error) {
+      report('error', `fallback JSON-LD in src/index.html is not valid JSON: ${error.message}`);
+    }
+  }
+}
+console.log('');
 
 // --- Crawler files ----------------------------------------------------------------------------
 console.log('crawler files');
