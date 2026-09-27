@@ -8,16 +8,23 @@ export const HOME_PATH = '';
 
 /**
  * Search / social contract of the Home page, applied on navigation by SeoTitleStrategy and
- * baked into the pre-rendered HTML at build time (see app/seo). The portrait is a tall image,
- * so the Twitter card stays `summary` (a square crop) rather than `summary_large_image`.
+ * baked into the pre-rendered HTML at build time (see app/seo).
+ *
+ * Note on the card size: `summary_large_image` asks scrapers for a wide (≈1.91:1) banner, but
+ * the share image here is the 800×1421 portrait, so X and WhatsApp centre-crop it to a band
+ * across the middle. Switch this back to 'summary' for an uncropped square thumbnail, or point
+ * `image` at a purpose-made 1200×630 card to use the wide slot properly.
  */
 const HOME_SEO: PageSeo = {
   description: SITE.seo.description,
+  socialDescription: SITE.seo.socialDescription,
   image: SITE.portrait.src,
   imageAlt: SITE.portrait.alt,
   imageWidth: SITE.portrait.width,
   imageHeight: SITE.portrait.height,
-  twitterCard: 'summary',
+  type: 'website',
+  twitterCard: 'summary_large_image',
+  robots: 'index, follow',
   jsonLd: homeStructuredData,
 };
 
@@ -33,7 +40,7 @@ const HOME_SEO: PageSeo = {
 export const routes: Routes = [
   {
     path: HOME_PATH,
-    title: `${SITE.name} — ${SITE.role}`,
+    title: `${SITE.name} | ${SITE.role}`,
     data: { seo: HOME_SEO },
     loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
   },

@@ -32,17 +32,40 @@ export const SITE = {
   /**
    * Public origin of the deployed site, no trailing slash (e.g. 'https://example.com'). It is
    * the base of every absolute URL baked into the pre-rendered HTML — canonical, og:url,
-   * og:image, JSON-LD — and of the generated sitemap.xml / robots.txt. Leave empty to resolve it
-   * at build time from the environment instead (`SITE_URL`, or Vercel's
-   * `VERCEL_PROJECT_PRODUCTION_URL` — see app/seo/site-url.server.ts).
+   * og:image, JSON-LD — and of the generated sitemap.xml / robots.txt.
+   *
+   * Set explicitly so the absolute tags never depend on a build environment variable: an empty
+   * value falls back to `SITE_URL` or Vercel's `VERCEL_PROJECT_PRODUCTION_URL`
+   * (see app/seo/site-url.server.ts), and when neither is present the canonical, og:url and
+   * og:image are omitted entirely — which is what stops link scrapers showing a preview image.
+   * Keep it in step with the static fallback tags in src/index.html (verified after each build
+   * by scripts/verify-prerender.mjs).
    */
-  siteUrl: '',
+  siteUrl: 'https://mohammedsuhail.vercel.app',
   /** Search / social defaults (see app/seo); a route overrides them through its `seo` data. */
   seo: {
     description:
       'Mohammed Suhail is a full stack developer in Chennai, Tamil Nadu, building responsive, scalable web applications with Angular, TypeScript and .NET.',
+    /**
+     * Shorter copy for link previews (Open Graph / Twitter), where a long description is
+     * truncated by the scraper. Search engines keep the fuller `description` above.
+     */
+    socialDescription: 'Explore projects, skills, and experience in web development.',
     /** Open Graph locale. */
     locale: 'en_IN',
+    /**
+     * `<meta name="keywords">`. Google has ignored this tag since 2009 and it carries no ranking
+     * weight; it is emitted because some smaller crawlers and internal site searches still read it.
+     */
+    keywords: [
+      'Mohammed Suhail',
+      'full stack developer',
+      'Angular developer',
+      'TypeScript',
+      '.NET developer',
+      'web development',
+      'Chennai',
+    ],
     /** Topics listed on the Person in the structured data (`knowsAbout`). */
     knowsAbout: ['Angular', 'TypeScript', 'JavaScript', 'C#', '.NET', 'SQL'],
   },

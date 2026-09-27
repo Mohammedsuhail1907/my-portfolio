@@ -33,6 +33,9 @@ export class SeoService {
   apply(seo: PageSeo, routeUrl: string): SeoContext {
     const title = seo.title || this.title.getTitle();
     const description = seo.description ?? SITE.seo.description;
+    // Link scrapers truncate long copy, so the social tags may carry their own shorter line.
+    const socialDescription = seo.socialDescription ?? description;
+    const keywords = (seo.keywords ?? SITE.seo.keywords).join(', ');
     const path = seo.canonicalPath ?? routeUrl.split(/[?#]/)[0];
     const url = absoluteUrl(this.siteUrl, path || '/');
     const image = seo.image ? absoluteUrl(this.siteUrl, seo.image) : '';
@@ -40,6 +43,7 @@ export class SeoService {
 
     this.title.setTitle(title);
     this.setMeta('name', 'description', description);
+    this.setMeta('name', 'keywords', keywords);
     this.setMeta('name', 'robots', seo.robots);
     this.setCanonical(url);
 
@@ -47,7 +51,7 @@ export class SeoService {
     this.setMeta('property', 'og:site_name', SITE.name);
     this.setMeta('property', 'og:locale', SITE.seo.locale);
     this.setMeta('property', 'og:title', title);
-    this.setMeta('property', 'og:description', description);
+    this.setMeta('property', 'og:description', socialDescription);
     this.setMeta('property', 'og:url', url);
     this.setMeta('property', 'og:image', image);
     this.setMeta('property', 'og:image:alt', imageAlt);
@@ -56,7 +60,7 @@ export class SeoService {
 
     this.setMeta('name', 'twitter:card', seo.twitterCard ?? 'summary');
     this.setMeta('name', 'twitter:title', title);
-    this.setMeta('name', 'twitter:description', description);
+    this.setMeta('name', 'twitter:description', socialDescription);
     this.setMeta('name', 'twitter:image', image);
     this.setMeta('name', 'twitter:image:alt', imageAlt);
 

@@ -19,8 +19,18 @@ export interface SeoContext {
 export interface PageSeo {
   /** Overrides the route's `title` property (which is used when omitted). */
   title?: string;
-  /** Meta / Open Graph description. Defaults to `SITE.seo.description`. */
+  /** Meta description, used for search. Defaults to `SITE.seo.description`. */
   description?: string;
+  /**
+   * Shorter description for link previews (og:description / twitter:description), where
+   * scrapers truncate long copy. Falls back to `description`.
+   */
+  socialDescription?: string;
+  /**
+   * `<meta name="keywords">`. Defaults to `SITE.seo.keywords`; pass `[]` to omit the tag.
+   * Ignored by the major search engines — see the note in site.config.ts.
+   */
+  keywords?: readonly string[];
   /** Site-relative canonical path ('/', '/about'). Defaults to the route URL without query or fragment. */
   canonicalPath?: string;
   /** Share image: site-relative ('assets/images/x.jpg') or absolute. */

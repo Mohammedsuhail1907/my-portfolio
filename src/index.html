@@ -2,15 +2,103 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Mohammed Suhail — Full Stack Developer</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- The title and description here are fallbacks only. Every page's title, description,
-       canonical, Open Graph / Twitter tags and JSON-LD are written by SeoService (src/app/seo)
-       from the route's `title` + `data.seo`, and baked into the pre-rendered HTML at build time
-       (angular.json `outputMode: "static"`). Edit them in app.routes.ts / site.config.ts. -->
+
+  <!-- ==========================================================================================
+       STATIC SEO / SOCIAL HEAD
+       ==========================================================================================
+       Every tag below is also written at build time by SeoService (src/app/seo) from the route's
+       `title` + `data.seo`, and Angular's Meta service updates each one IN PLACE (matched on its
+       name/property), so the pre-rendered HTML carries exactly one of each — never a duplicate.
+
+       They are hard-coded here as well so the contract holds even for a response that never runs
+       the app: the un-hydrated shell (index.csr.html), a scraper that ignores JavaScript, or a
+       build where pre-rendering is turned off.
+
+       The values mirror src/app/config/site.config.ts and src/app/app.routes.ts. Change them
+       there first; `npm run build` re-checks that this block still agrees with the rendered
+       output and warns on drift (scripts/verify-prerender.mjs).
+       ========================================================================================== -->
+
+  <title>Mohammed Suhail | Full Stack Developer</title>
   <meta name="description" content="Mohammed Suhail is a full stack developer in Chennai, Tamil Nadu, building responsive, scalable web applications with Angular, TypeScript and .NET.">
+  <meta name="keywords" content="Mohammed Suhail, full stack developer, Angular developer, TypeScript, .NET developer, web development, Chennai">
   <meta name="author" content="Mohammed Suhail">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://mohammedsuhail.vercel.app/">
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp, Slack, Discord) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Mohammed Suhail">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:url" content="https://mohammedsuhail.vercel.app/">
+  <meta property="og:title" content="Mohammed Suhail | Full Stack Developer">
+  <meta property="og:description" content="Explore projects, skills, and experience in web development.">
+  <meta property="og:image" content="https://mohammedsuhail.vercel.app/assets/images/portrait.jpg">
+  <meta property="og:image:alt" content="Portrait of Mohammed Suhail, full stack developer">
+  <meta property="og:image:width" content="800">
+  <meta property="og:image:height" content="1421">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mohammed Suhail | Full Stack Developer">
+  <meta name="twitter:description" content="Explore projects, skills, and experience in web development.">
+  <meta name="twitter:image" content="https://mohammedsuhail.vercel.app/assets/images/portrait.jpg">
+  <meta name="twitter:image:alt" content="Portrait of Mohammed Suhail, full stack developer">
+
+  <!-- Structured data. `data-seo-jsonld` is the marker SeoService uses to replace this block
+       rather than append a second one (see SeoService.setJsonLd). -->
+  <script type="application/ld+json" data-seo-jsonld>
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://mohammedsuhail.vercel.app/#person",
+        "name": "Mohammed Suhail",
+        "jobTitle": "Full Stack Developer",
+        "description": "Mohammed Suhail is a full stack developer in Chennai, Tamil Nadu, building responsive, scalable web applications with Angular, TypeScript and .NET.",
+        "email": "mailto:Mohammedsuhail1907@gmail.com",
+        "telephone": "+91 9003887006",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Chennai",
+          "addressRegion": "Tamil Nadu",
+          "addressCountry": "IN"
+        },
+        "url": "https://mohammedsuhail.vercel.app/",
+        "image": "https://mohammedsuhail.vercel.app/assets/images/portrait.jpg",
+        "sameAs": [
+          "https://www.linkedin.com/in/mohammed-suhail-b3b17b24a/",
+          "https://github.com/Mohammedsuhail1907",
+          "https://www.facebook.com/share/1LCjB5Ufi6/",
+          "https://www.instagram.com/sh_a1907"
+        ],
+        "knowsAbout": ["Angular", "TypeScript", "JavaScript", "C#", ".NET", "SQL"]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://mohammedsuhail.vercel.app/#website",
+        "url": "https://mohammedsuhail.vercel.app/",
+        "name": "Mohammed Suhail — Portfolio",
+        "inLanguage": "en",
+        "publisher": { "@id": "https://mohammedsuhail.vercel.app/#person" }
+      },
+      {
+        "@type": "ProfilePage",
+        "@id": "https://mohammedsuhail.vercel.app/",
+        "url": "https://mohammedsuhail.vercel.app/",
+        "name": "Mohammed Suhail | Full Stack Developer",
+        "description": "Mohammed Suhail is a full stack developer in Chennai, Tamil Nadu, building responsive, scalable web applications with Angular, TypeScript and .NET.",
+        "inLanguage": "en",
+        "isPartOf": { "@id": "https://mohammedsuhail.vercel.app/#website" },
+        "mainEntity": { "@id": "https://mohammedsuhail.vercel.app/#person" }
+      }
+    ]
+  }
+  </script>
+
   <meta name="theme-color" content="#ffffff">
 
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
